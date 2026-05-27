@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 const projects = [
@@ -68,9 +68,25 @@ const starterTasks = [
   },
 ];
 
+const emptyMove = {
+  projectId: "geek",
+  day: "Monday",
+  time: "",
+  title: "",
+  type: "Task",
+  note: "",
+};
+
 function App() {
-  const [tasks, setTasks] = useState(starterTasks);
+ 
   const [activeProject, setActiveProject] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newMove, setNewMove] = useState(emptyMove);
+  const [tasks, setTasks] = useState(() => {
+  const saved = localStorage.getItem("planweiser-tasks");
+
+  return saved ? JSON.parse(saved) : starterTasks;
+});
 
   const filteredTasks = useMemo(() => {
     if (activeProject === "all") return tasks;
@@ -78,7 +94,17 @@ function App() {
   }, [activeProject, tasks]);
 
   const completed = tasks.filter((task) => task.done).length;
-  const progress = Math.round((completed / tasks.length) * 100);
+  const progress = tasks.length
+    ? Math.round((completed / tasks.length) * 100)
+    : 0;
+
+  
+  useEffect(() => {
+  localStorage.setItem(
+    "planweiser-tasks",
+    JSON.stringify(tasks)
+  );
+}, [tasks]);  
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -86,6 +112,30 @@ function App() {
         task.id === id ? { ...task, done: !task.done } : task
       )
     );
+  }
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setNewMove((current) => ({ ...current, [name]: value }));
+  }
+
+  function addMove(event) {
+    event.preventDefault();
+
+    if (!newMove.title.trim()) return;
+
+    setTasks((current) => [
+      {
+        id: Date.now(),
+        ...newMove,
+        time: newMove.time || "Flexible",
+        done: false,
+      },
+      ...current,
+    ]);
+
+    setNewMove(emptyMove);
+    setIsModalOpen(false);
   }
 
   return (
@@ -143,12 +193,17 @@ function App() {
             <p className="eyebrow">This Week</p>
             <h2>Springboard Moves</h2>
           </div>
-          <button className="ghost-button">+ Add Move</button>
+
+          <button className="ghost-button" onClick={() => setIsModalOpen(true)}>
+            + Add Move
+          </button>
         </div>
 
         <div className="task-list">
           {filteredTasks.map((task) => {
-            const project = projects.find((item) => item.id === task.projectId);
+            const project = projects.find(
+              (item) => item.id === task.projectId
+            );
 
             return (
               <article
@@ -175,6 +230,105 @@ function App() {
           })}
         </div>
       </section>
+
+      {isModalOpen && (
+        <div className="modal-backdrop">
+          <form className="move-modal" onSubmit={addMove}>
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">New Move</p>
+                <h2>Add to this week</h2>
+              </div>
+
+              <button
+                type="button"
+                className="close-button"
+                onClick={() => setIsModalOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <label>
+              Project
+              <select
+                name="projectId"
+                value={newMove.projectId}
+                onChange={handleChange}
+              >
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.emoji} {project.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="form-row">
+              <label>
+                Day
+                <select name="day" value={newMove.day} onChange={handleChange}>
+                  {[
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                  ].map((day) => (
+                    <option key={day}>{day}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Time
+                <input
+                  name="time"
+                  value={newMove.time}
+                  onChange={handleChange}
+                  placeholder="7:17 PM"
+                />
+              </label>
+            </div>
+
+            <label>
+              Type
+              <input
+                name="type"
+                value={newMove.type}
+                onChange={handleChange}
+                placeholder="Instagram, Threads, Task..."
+              />
+            </label>
+
+            <label>
+              Title
+              <input
+                name="title"
+                value={newMove.title}
+                onChange={handleChange}
+                placeholder="Post product carousel"
+              />
+            </label>
+
+            <label>
+              Note
+              <textarea
+                name="note"
+                value={newMove.note}
+                onChange={handleChange}
+                placeholder="Keep it funny, light, and non-pushy."
+              />
+            </label>
+
+            <button className="submit-button" type="submit">
+              Add Move
+            </button>
+          </form>
+        </div>
+      )}
     </main>
   );
 }
