@@ -78,15 +78,24 @@ const emptyMove = {
 };
 
 function App() {
- 
+
   const [activeProject, setActiveProject] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMove, setNewMove] = useState(emptyMove);
-  const [tasks, setTasks] = useState(() => {
-  const saved = localStorage.getItem("planweiser-tasks");
+  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
 
-  return saved ? JSON.parse(saved) : starterTasks;
-});
+  const [generatorSettings, setGeneratorSettings] = useState({
+    energy: "medium",
+    focus: "all",
+    goal: "engagement",
+    tone: "funny",
+  });
+
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem("planweiser-tasks");
+
+    return saved ? JSON.parse(saved) : starterTasks;
+  });
 
   const filteredTasks = useMemo(() => {
     if (activeProject === "all") return tasks;
@@ -98,13 +107,13 @@ function App() {
     ? Math.round((completed / tasks.length) * 100)
     : 0;
 
-  
+
   useEffect(() => {
-  localStorage.setItem(
-    "planweiser-tasks",
-    JSON.stringify(tasks)
-  );
-}, [tasks]);  
+    localStorage.setItem(
+      "planweiser-tasks",
+      JSON.stringify(tasks)
+    );
+  }, [tasks]);
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -136,6 +145,71 @@ function App() {
 
     setNewMove(emptyMove);
     setIsModalOpen(false);
+  }
+
+  function generateWeek() {
+    const generated = [];
+
+    if (
+      generatorSettings.focus === "all" ||
+      generatorSettings.focus === "etsy"
+    ) {
+      generated.push({
+        id: Date.now() + 1,
+        projectId: "geek",
+        day: "Monday",
+        time: "9:00 AM",
+        title: "Post product lifestyle photo",
+        type: "Instagram",
+        note:
+          generatorSettings.tone === "funny"
+            ? "Keep it witty and subtle."
+            : "Focus on product visibility.",
+        done: false,
+      });
+    }
+
+    if (
+      generatorSettings.focus === "all" ||
+      generatorSettings.focus === "music"
+    ) {
+      generated.push({
+        id: Date.now() + 2,
+        projectId: "tza",
+        day: "Wednesday",
+        time: "7:17 PM",
+        title: "Post riff teaser or meme edit",
+        type: "Threads",
+        note:
+          generatorSettings.goal === "release"
+            ? "Push anticipation for upcoming release."
+            : "Maintain audience momentum.",
+        done: false,
+      });
+    }
+
+    if (
+      generatorSettings.focus === "all" ||
+      generatorSettings.focus === "personal"
+    ) {
+      generated.push({
+        id: Date.now() + 3,
+        projectId: "personal",
+        day: "Friday",
+        time: "12:00 PM",
+        title: "Post personal creative thought",
+        type: "Threads",
+        note:
+          generatorSettings.energy === "low"
+            ? "Low-effort relatable post."
+            : "Higher-energy engaging post.",
+        done: false,
+      });
+    }
+
+    setTasks((current) => [...generated, ...current]);
+
+    setIsGeneratorOpen(false);
   }
 
   return (
@@ -175,9 +249,8 @@ function App() {
         {projects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${project.color} ${
-              activeProject === project.id ? "active" : ""
-            }`}
+            className={`project-card ${project.color} ${activeProject === project.id ? "active" : ""
+              }`}
             onClick={() => setActiveProject(project.id)}
           >
             <span>{project.emoji}</span>
@@ -194,9 +267,21 @@ function App() {
             <h2>Springboard Moves</h2>
           </div>
 
-          <button className="ghost-button" onClick={() => setIsModalOpen(true)}>
-            + Add Move
-          </button>
+          <div className="header-buttons">
+            <button
+              className="ghost-button"
+              onClick={() => setIsGeneratorOpen(true)}
+            >
+              ⚡ Generate Week
+            </button>
+
+            <button
+              className="ghost-button"
+              onClick={() => setIsModalOpen(true)}
+            >
+              + Add Move
+            </button>
+          </div>
         </div>
 
         <div className="task-list">
@@ -327,6 +412,104 @@ function App() {
               Add Move
             </button>
           </form>
+        </div>
+      )}
+
+      {isGeneratorOpen && (
+        <div className="modal-backdrop">
+          <div className="move-modal">
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Planweiser AI</p>
+                <h2>Generate This Week</h2>
+              </div>
+
+              <button
+                className="close-button"
+                onClick={() => setIsGeneratorOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <label>
+              Energy
+              <select
+                value={generatorSettings.energy}
+                onChange={(e) =>
+                  setGeneratorSettings((current) => ({
+                    ...current,
+                    energy: e.target.value,
+                  }))
+                }
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+
+            <label>
+              Focus
+              <select
+                value={generatorSettings.focus}
+                onChange={(e) =>
+                  setGeneratorSettings((current) => ({
+                    ...current,
+                    focus: e.target.value,
+                  }))
+                }
+              >
+                <option value="all">All</option>
+                <option value="etsy">Etsy</option>
+                <option value="music">Music</option>
+                <option value="personal">Personal</option>
+              </select>
+            </label>
+
+            <label>
+              Goal
+              <select
+                value={generatorSettings.goal}
+                onChange={(e) =>
+                  setGeneratorSettings((current) => ({
+                    ...current,
+                    goal: e.target.value,
+                  }))
+                }
+              >
+                <option value="engagement">Engagement</option>
+                <option value="sales">Sales</option>
+                <option value="consistency">Consistency</option>
+                <option value="release">Release Push</option>
+              </select>
+            </label>
+
+            <label>
+              Tone
+              <select
+                value={generatorSettings.tone}
+                onChange={(e) =>
+                  setGeneratorSettings((current) => ({
+                    ...current,
+                    tone: e.target.value,
+                  }))
+                }
+              >
+                <option value="funny">Funny</option>
+                <option value="motivational">Motivational</option>
+                <option value="direct">Direct</option>
+                <option value="nonsalesy">Non-salesy</option>
+              </select>
+            </label>
+
+            <button
+              className="submit-button"
+              onClick={generateWeek}
+            >
+              ⚡ Generate Week
+            </button>
+          </div>
         </div>
       )}
     </main>
