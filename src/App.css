@@ -304,6 +304,18 @@ h1 {
   flex-wrap: wrap;
 }
 
+.task-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.danger-button {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fffaf1 !important;
+}
+
+
 @media (max-width: 850px) {
   .hero,
   .project-grid {
@@ -327,5 +339,13 @@ h1 {
 
     .form-row {
     grid-template-columns: 1fr;
+  }
+
+    .task-actions {
+    width: 100%;
+  }
+
+  .task-actions button {
+    flex: 1;
   }
 }

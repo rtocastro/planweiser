@@ -83,6 +83,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
   const [generatorSettings, setGeneratorSettings] = useState({
     energy: "medium",
@@ -121,6 +122,20 @@ function App() {
         task.id === id ? { ...task, done: !task.done } : task
       )
     );
+  }
+
+  function deleteTask(id) {
+    setTasks((current) => current.filter((task) => task.id !== id));
+  }
+
+  function saveEditedTask(updatedTask) {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+
+    setEditingTask(null);
   }
 
   function handleChange(event) {
@@ -307,9 +322,18 @@ function App() {
                   </div>
                 </div>
 
-                <button onClick={() => toggleTask(task.id)}>
-                  {task.done ? "Done" : "Mark Done"}
-                </button>
+                <div className="task-actions">
+                  <button onClick={() => setEditingTask(task)}>
+                    Edit
+                  </button>
+                  <button onClick={() => toggleTask(task.id)}>
+                    {task.done ? "Done" : "Mark Done"}
+                  </button>
+
+                  <button className="danger-button" onClick={() => deleteTask(task.id)}>
+                    Delete
+                  </button>
+                </div>
               </article>
             );
           })}
@@ -510,6 +534,76 @@ function App() {
               ⚡ Generate Week
             </button>
           </div>
+        </div>
+      )}
+
+      {editingTask && (
+        <div className="modal-backdrop">
+          <form
+            className="move-modal"
+            onSubmit={(e) => {
+              e.preventDefault();
+              saveEditedTask(editingTask);
+            }}
+          >
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Edit Move</p>
+                <h2>{editingTask.title}</h2>
+              </div>
+
+              <button
+                type="button"
+                className="close-button"
+                onClick={() => setEditingTask(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            <label>
+              Title
+              <input
+                value={editingTask.title}
+                onChange={(e) =>
+                  setEditingTask((current) => ({
+                    ...current,
+                    title: e.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <label>
+              Note
+              <textarea
+                value={editingTask.note}
+                onChange={(e) =>
+                  setEditingTask((current) => ({
+                    ...current,
+                    note: e.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <label>
+              Time
+              <input
+                value={editingTask.time}
+                onChange={(e) =>
+                  setEditingTask((current) => ({
+                    ...current,
+                    time: e.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <button className="submit-button">
+              Save Changes
+            </button>
+          </form>
         </div>
       )}
     </main>
