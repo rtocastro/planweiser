@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { templates } from "./data/templates";
 import "./App.css";
 
 const projects = [
@@ -84,6 +85,8 @@ function App() {
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState("lowEnergy");
 
   const [generatorSettings, setGeneratorSettings] = useState({
     energy: "medium",
@@ -224,6 +227,19 @@ function App() {
 
     setTasks((current) => [...generated, ...current]);
 
+    setIsGeneratorOpen(false);
+  }
+
+  function generateFromTemplate() {
+    const selected = templates[selectedTemplate];
+
+    const generated = selected.tasks.map((task, index) => ({
+      id: Date.now() + index,
+      ...task,
+      done: false,
+    }));
+
+    setTasks((current) => [...generated, ...current]);
     setIsGeneratorOpen(false);
   }
 
@@ -527,9 +543,22 @@ function App() {
               </select>
             </label>
 
+            <label>
+              Template
+              <select
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+              >
+                <option value="lowEnergy">Low Energy Week</option>
+                <option value="etsyPush">Etsy Push</option>
+                <option value="releaseWeek">Release Week</option>
+                <option value="burnoutRecovery">Burnout Recovery</option>
+              </select>
+            </label>
+
             <button
               className="submit-button"
-              onClick={generateWeek}
+              onClick={generateFromTemplate}
             >
               ⚡ Generate Week
             </button>
