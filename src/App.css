@@ -315,6 +315,27 @@ h1 {
   color: #fffaf1 !important;
 }
 
+.archive-section {
+  margin-top: 32px;
+}
+
+.archive-list {
+  display: grid;
+  gap: 12px;
+}
+
+.archive-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.archive-card p {
+  margin-bottom: 0;
+  color: #d8cfc4;
+}
+
 
 @media (max-width: 850px) {
   .hero,

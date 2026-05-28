@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { templates } from "./data/templates";
 import "./App.css";
 
+import TaskCard from "./components/TaskCard";
+
 const projects = [
   {
     id: "geek",
@@ -85,6 +87,7 @@ function App() {
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+
   const [selectedTemplate, setSelectedTemplate] =
     useState("lowEnergy");
 
@@ -99,6 +102,11 @@ function App() {
     const saved = localStorage.getItem("planweiser-tasks");
 
     return saved ? JSON.parse(saved) : starterTasks;
+  });
+
+  const [archives, setArchives] = useState(() => {
+    const saved = localStorage.getItem("planweiser-archives");
+    return saved ? JSON.parse(saved) : [];
   });
 
   const filteredTasks = useMemo(() => {
@@ -118,6 +126,13 @@ function App() {
       JSON.stringify(tasks)
     );
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "planweiser-archives",
+      JSON.stringify(archives)
+    );
+  }, [archives]);
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -243,6 +258,21 @@ function App() {
     setIsGeneratorOpen(false);
   }
 
+  function archiveWeek() {
+    if (!tasks.length) return;
+
+    const archive = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      completed: tasks.filter((task) => task.done).length,
+      total: tasks.length,
+      tasks,
+    };
+
+    setArchives((current) => [archive, ...current]);
+    setTasks([]);
+  }
+
   return (
     <main className="app-shell">
       <section className="hero">
@@ -312,6 +342,10 @@ function App() {
             >
               + Add Move
             </button>
+
+            <button className="ghost-button danger-button" onClick={archiveWeek}>
+              Archive Week
+            </button>
           </div>
         </div>
 
@@ -322,39 +356,36 @@ function App() {
             );
 
             return (
-              <article
+              <TaskCard
                 key={task.id}
-                className={`task-card ${task.done ? "done" : ""}`}
-              >
-                <div className="task-main">
-                  <div className="task-badge">{project?.emoji}</div>
-
-                  <div>
-                    <p className="task-meta">
-                      {task.day} · {task.time} · {task.type}
-                    </p>
-                    <h3>{task.title}</h3>
-                    <p>{task.note}</p>
-                  </div>
-                </div>
-
-                <div className="task-actions">
-                  <button onClick={() => setEditingTask(task)}>
-                    Edit
-                  </button>
-                  <button onClick={() => toggleTask(task.id)}>
-                    {task.done ? "Done" : "Mark Done"}
-                  </button>
-
-                  <button className="danger-button" onClick={() => deleteTask(task.id)}>
-                    Delete
-                  </button>
-                </div>
-              </article>
+                task={task}
+                project={project}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onEdit={setEditingTask}
+              />
             );
           })}
         </div>
       </section>
+
+      {archives.length > 0 && (
+        <section className="archive-section">
+          <p className="eyebrow">History</p>
+          <h2>Archived Weeks</h2>
+
+          <div className="archive-list">
+            {archives.slice(0, 5).map((archive) => (
+              <article className="archive-card" key={archive.id}>
+                <strong>{archive.date}</strong>
+                <p>
+                  {archive.completed} of {archive.total} moves completed
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {isModalOpen && (
         <div className="modal-backdrop">
