@@ -6,6 +6,7 @@ import "./App.css";
 import TaskCard from "./components/TaskCard";
 import GeneratorModal from "./components/GeneratorModal";
 import AddMoveModal from "./components/AddMoveModal";
+import EditTaskModal from "./components/EditTaskModal";
 
 const projects = [
   {
@@ -390,96 +391,30 @@ function App() {
         </section>
       )}
 
-      {isModalOpen && (
-        <GeneratorModal
-          isOpen={isGeneratorOpen}
-          onClose={() => setIsGeneratorOpen(false)}
-          generatorSettings={generatorSettings}
-          setGeneratorSettings={setGeneratorSettings}
-          selectedTemplate={selectedTemplate}
-          setSelectedTemplate={setSelectedTemplate}
-          generateFromTemplate={generateFromTemplate}
-        />
-      )}
+      <GeneratorModal
+        isOpen={isGeneratorOpen}
+        onClose={() => setIsGeneratorOpen(false)}
+        generatorSettings={generatorSettings}
+        setGeneratorSettings={setGeneratorSettings}
+        selectedTemplate={selectedTemplate}
+        setSelectedTemplate={setSelectedTemplate}
+        generateFromTemplate={generateFromTemplate}
+      />
 
- <AddMoveModal
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  newMove={newMove}
-  projects={projects}
-  handleChange={handleChange}
-  addMove={addMove}
-/>
+      <AddMoveModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        newMove={newMove}
+        projects={projects}
+        handleChange={handleChange}
+        addMove={addMove}
+      />
 
-      {editingTask && (
-        <div className="modal-backdrop">
-          <form
-            className="move-modal"
-            onSubmit={(e) => {
-              e.preventDefault();
-              saveEditedTask(editingTask);
-            }}
-          >
-            <div className="modal-header">
-              <div>
-                <p className="eyebrow">Edit Move</p>
-                <h2>{editingTask.title}</h2>
-              </div>
-
-              <button
-                type="button"
-                className="close-button"
-                onClick={() => setEditingTask(null)}
-              >
-                ×
-              </button>
-            </div>
-
-            <label>
-              Title
-              <input
-                value={editingTask.title}
-                onChange={(e) =>
-                  setEditingTask((current) => ({
-                    ...current,
-                    title: e.target.value,
-                  }))
-                }
-              />
-            </label>
-
-            <label>
-              Note
-              <textarea
-                value={editingTask.note}
-                onChange={(e) =>
-                  setEditingTask((current) => ({
-                    ...current,
-                    note: e.target.value,
-                  }))
-                }
-              />
-            </label>
-
-            <label>
-              Time
-              <input
-                value={editingTask.time}
-                onChange={(e) =>
-                  setEditingTask((current) => ({
-                    ...current,
-                    time: e.target.value,
-                  }))
-                }
-              />
-            </label>
-
-            <button className="submit-button">
-              Save Changes
-            </button>
-          </form>
-        </div>
-      )}
+      <EditTaskModal
+        editingTask={editingTask}
+        setEditingTask={setEditingTask}
+        saveEditedTask={saveEditedTask}
+      />
     </main>
   );
 }
