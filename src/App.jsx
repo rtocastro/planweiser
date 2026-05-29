@@ -7,6 +7,8 @@ import TaskCard from "./components/TaskCard";
 import GeneratorModal from "./components/GeneratorModal";
 import AddMoveModal from "./components/AddMoveModal";
 import EditTaskModal from "./components/EditTaskModal";
+import ArchiveSection from "./components/ArchiveSection";
+import InsightsPanel from "./components/InsightsPanel";
 
 const projects = [
   {
@@ -122,6 +124,27 @@ function App() {
   const progress = tasks.length
     ? Math.round((completed / tasks.length) * 100)
     : 0;
+
+  const momentumScore = tasks.reduce((total, task) => {
+    if (!task.done) return total;
+
+    switch (task.type.toLowerCase()) {
+      case "instagram":
+        return total + 10;
+
+      case "threads":
+        return total + 5;
+
+      case "instagram reel":
+        return total + 15;
+
+      case "task":
+        return total + 3;
+
+      default:
+        return total + 5;
+    }
+  }, 0);
 
 
   useEffect(() => {
@@ -298,6 +321,13 @@ function App() {
           <p>
             {completed} of {tasks.length} moves completed
           </p>
+
+          <hr />
+
+          <div className="momentum-block">
+            <span>Momentum</span>
+            <strong>{momentumScore}</strong>
+          </div>
         </div>
       </section>
 
@@ -373,23 +403,8 @@ function App() {
         </div>
       </section>
 
-      {archives.length > 0 && (
-        <section className="archive-section">
-          <p className="eyebrow">History</p>
-          <h2>Archived Weeks</h2>
-
-          <div className="archive-list">
-            {archives.slice(0, 5).map((archive) => (
-              <article className="archive-card" key={archive.id}>
-                <strong>{archive.date}</strong>
-                <p>
-                  {archive.completed} of {archive.total} moves completed
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
+      <ArchiveSection archives={archives} />
+      <InsightsPanel tasks={tasks} />  
 
       <GeneratorModal
         isOpen={isGeneratorOpen}

@@ -336,6 +336,14 @@ h1 {
   color: #d8cfc4;
 }
 
+.momentum-block {
+  margin-top: 16px;
+}
+
+.momentum-block strong {
+  display: block;
+  font-size: 2rem;
+}
 
 @media (max-width: 850px) {
   .hero,
