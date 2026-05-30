@@ -9,6 +9,7 @@ import AddMoveModal from "./components/AddMoveModal";
 import EditTaskModal from "./components/EditTaskModal";
 import ArchiveSection from "./components/ArchiveSection";
 import InsightsPanel from "./components/InsightsPanel";
+import TemplateLibrary from "./components/TemplateLibrary";
 
 const projects = [
   {
@@ -251,6 +252,26 @@ function App() {
     setNewTemplateName("");
   }
 
+        function loadTemplate(template) {
+      const loadedTasks = template.tasks.map(
+        (task, index) => ({
+          id: Date.now() + index,
+          ...task,
+          done: false,
+        })
+      );
+
+      setTasks(loadedTasks);
+    }
+
+    function deleteTemplate(id) {
+      setCustomTemplates((current) =>
+        current.filter(
+          (template) => template.id !== id
+        )
+      );
+    }
+
   function handleChange(event) {
     const { name, value } = event.target;
     setNewMove((current) => ({ ...current, [name]: value }));
@@ -274,6 +295,7 @@ function App() {
     setNewMove(emptyMove);
     setIsModalOpen(false);
   }
+
 
   function generateWeek() {
     const generated = [];
@@ -497,6 +519,12 @@ ${generatorNotes.avoid}
           })}
         </div>
       </section>
+
+      <TemplateLibrary
+        customTemplates={customTemplates}
+        loadTemplate={loadTemplate}
+        deleteTemplate={deleteTemplate}
+      />
 
       <ArchiveSection archives={archives} />
 
