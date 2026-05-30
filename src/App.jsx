@@ -104,7 +104,10 @@ function App() {
     tone: "funny",
   });
 
-    const [generatorNotes, setGeneratorNotes] = useState(() => {
+  const [newTemplateName, setNewTemplateName] =
+    useState("");
+
+  const [generatorNotes, setGeneratorNotes] = useState(() => {
     const saved = localStorage.getItem("planweiser-generator-notes");
 
     return saved
@@ -127,6 +130,16 @@ function App() {
   const [archives, setArchives] = useState(() => {
     const saved = localStorage.getItem("planweiser-archives");
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [customTemplates, setCustomTemplates] = useState(() => {
+    const saved = localStorage.getItem(
+      "planweiser-custom-templates"
+    );
+
+    return saved
+      ? JSON.parse(saved)
+      : [];
   });
 
 
@@ -177,11 +190,18 @@ function App() {
   }, [archives]);
 
   useEffect(() => {
-  localStorage.setItem(
-    "planweiser-generator-notes",
-    JSON.stringify(generatorNotes)
-  );
-}, [generatorNotes]);
+    localStorage.setItem(
+      "planweiser-generator-notes",
+      JSON.stringify(generatorNotes)
+    );
+  }, [generatorNotes]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "planweiser-custom-templates",
+      JSON.stringify(customTemplates)
+    );
+  }, [customTemplates]);
 
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
@@ -198,14 +218,38 @@ function App() {
   }
 
   function toggleTask(id) {
-  setTasks((current) =>
-    current.map((task) =>
-      task.id === id
-        ? { ...task, done: !task.done }
-        : task
-    )
-  );
-}
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id
+          ? { ...task, done: !task.done }
+          : task
+      )
+    );
+  }
+
+  function saveCurrentAsTemplate() {
+    if (!newTemplateName.trim()) return;
+
+    const template = {
+      id: Date.now(),
+      name: newTemplateName,
+      tasks: tasks.map((task) => ({
+        projectId: task.projectId,
+        day: task.day,
+        time: task.time,
+        title: task.title,
+        type: task.type,
+        note: task.note,
+      })),
+    };
+
+    setCustomTemplates((current) => [
+      template,
+      ...current,
+    ]);
+
+    setNewTemplateName("");
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -413,9 +457,24 @@ ${generatorNotes.avoid}
               + Add Move
             </button>
 
+            <button
+              className="ghost-button"
+              onClick={saveCurrentAsTemplate}
+            >
+              Save As Template
+            </button>
+
             <button className="ghost-button danger-button" onClick={archiveWeek}>
               Archive Week
             </button>
+            <input
+              className="template-input"
+              placeholder="PSPSPS Push Week"
+              value={newTemplateName}
+              onChange={(e) =>
+                setNewTemplateName(e.target.value)
+              }
+            />
           </div>
         </div>
 
@@ -440,6 +499,7 @@ ${generatorNotes.avoid}
       </section>
 
       <ArchiveSection archives={archives} />
+
       <InsightsPanel tasks={tasks} />
 
       <GeneratorModal
