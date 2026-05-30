@@ -6,6 +6,8 @@ function GeneratorModal({
   selectedTemplate,
   setSelectedTemplate,
   generateFromTemplate,
+  generatorNotes,
+  setGeneratorNotes,
 }) {
   if (!isOpen) return null;
 
@@ -112,6 +114,48 @@ function GeneratorModal({
               Burnout Recovery
             </option>
           </select>
+        </label>
+
+        <label>
+          Custom Direction
+          <textarea
+            value={generatorNotes.customDirection}
+            onChange={(e) =>
+              setGeneratorNotes((current) => ({
+                ...current,
+                customDirection: e.target.value,
+              }))
+            }
+            placeholder="Funny/quirky/witty/light motivation..."
+          />
+        </label>
+
+        <label>
+          Must Include
+          <textarea
+            value={generatorNotes.mustInclude}
+            onChange={(e) =>
+              setGeneratorNotes((current) => ({
+                ...current,
+                mustInclude: e.target.value,
+              }))
+            }
+            placeholder="PSPSPS tote, Marcel monkey meme..."
+          />
+        </label>
+
+        <label>
+          Avoid
+          <textarea
+            value={generatorNotes.avoid}
+            onChange={(e) =>
+              setGeneratorNotes((current) => ({
+                ...current,
+                avoid: e.target.value,
+              }))
+            }
+            placeholder="Cryptic posts, salesy language..."
+          />
         </label>
 
         <button

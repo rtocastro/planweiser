@@ -104,6 +104,20 @@ function App() {
     tone: "funny",
   });
 
+    const [generatorNotes, setGeneratorNotes] = useState(() => {
+    const saved = localStorage.getItem("planweiser-generator-notes");
+
+    return saved
+      ? JSON.parse(saved)
+      : {
+        customDirection:
+          "Funny, quirky, witty, light motivation, slightly unhinged.",
+        mustInclude: "",
+        avoid:
+          "Too cryptic, too salesy, burnout vibes, doom scrolling, overexplaining.",
+      };
+  });
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("planweiser-tasks");
 
@@ -114,6 +128,7 @@ function App() {
     const saved = localStorage.getItem("planweiser-archives");
     return saved ? JSON.parse(saved) : [];
   });
+
 
   const filteredTasks = useMemo(() => {
     if (activeProject === "all") return tasks;
@@ -161,13 +176,12 @@ function App() {
     );
   }, [archives]);
 
-  function toggleTask(id) {
-    setTasks((current) =>
-      current.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
-      )
-    );
-  }
+  useEffect(() => {
+  localStorage.setItem(
+    "planweiser-generator-notes",
+    JSON.stringify(generatorNotes)
+  );
+}, [generatorNotes]);
 
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
@@ -182,6 +196,16 @@ function App() {
 
     setEditingTask(null);
   }
+
+  function toggleTask(id) {
+  setTasks((current) =>
+    current.map((task) =>
+      task.id === id
+        ? { ...task, done: !task.done }
+        : task
+    )
+  );
+}
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -278,6 +302,18 @@ function App() {
     const generated = selected.tasks.map((task, index) => ({
       id: Date.now() + index,
       ...task,
+      note: `
+${task.note}
+
+Direction:
+${generatorNotes.customDirection}
+
+Must Include:
+${generatorNotes.mustInclude}
+
+Avoid:
+${generatorNotes.avoid}
+`.trim(),
       done: false,
     }));
 
@@ -404,7 +440,7 @@ function App() {
       </section>
 
       <ArchiveSection archives={archives} />
-      <InsightsPanel tasks={tasks} />  
+      <InsightsPanel tasks={tasks} />
 
       <GeneratorModal
         isOpen={isGeneratorOpen}
@@ -414,6 +450,8 @@ function App() {
         selectedTemplate={selectedTemplate}
         setSelectedTemplate={setSelectedTemplate}
         generateFromTemplate={generateFromTemplate}
+        generatorNotes={generatorNotes}
+        setGeneratorNotes={setGeneratorNotes}
       />
 
       <AddMoveModal
