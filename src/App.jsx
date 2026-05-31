@@ -10,6 +10,7 @@ import EditTaskModal from "./components/EditTaskModal";
 import ArchiveSection from "./components/ArchiveSection";
 import InsightsPanel from "./components/InsightsPanel";
 import TemplateLibrary from "./components/TemplateLibrary";
+import StyleProfile from "./components/StyleProfile";
 
 const projects = [
   {
@@ -87,6 +88,9 @@ const emptyMove = {
   note: "",
 };
 
+
+
+
 function App() {
 
   const [activeProject, setActiveProject] = useState("all");
@@ -114,11 +118,9 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        customDirection:
-          "Funny, quirky, witty, light motivation, slightly unhinged.",
-        mustInclude: "",
-        avoid:
-          "Too cryptic, too salesy, burnout vibes, doom scrolling, overexplaining.",
+        customDirection: styleProfile?.tone || "",
+        mustInclude: styleProfile?.mustInclude || "",
+        avoid: styleProfile?.avoid || "",
       };
   });
 
@@ -175,6 +177,28 @@ function App() {
     }
   }, 0);
 
+  const [styleProfile, setStyleProfile] =
+    useState(() => {
+      const saved = localStorage.getItem(
+        "planweiser-style-profile"
+      );
+
+      return saved
+        ? JSON.parse(saved)
+        : {
+          tone:
+            "funny, quirky, witty, light motivation, slightly unhinged",
+          mustInclude:
+            "Geek-E Garments, TZA, personal creativity",
+          avoid:
+            "salesy, cryptic, burnout vibes, overexplaining",
+          goal:
+            "consistency and growth",
+        };
+    });
+
+
+//useeffects
 
   useEffect(() => {
     localStorage.setItem(
@@ -203,6 +227,24 @@ function App() {
       JSON.stringify(customTemplates)
     );
   }, [customTemplates]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "planweiser-style-profile",
+      JSON.stringify(styleProfile)
+    );
+  }, [styleProfile]);
+
+  useEffect(() => {
+    setGeneratorNotes((current) => ({
+      ...current,
+      customDirection: styleProfile.tone,
+      mustInclude: styleProfile.mustInclude,
+      avoid: styleProfile.avoid,
+    }));
+  }, [styleProfile]);
+
+  //functions
 
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
@@ -252,25 +294,25 @@ function App() {
     setNewTemplateName("");
   }
 
-        function loadTemplate(template) {
-      const loadedTasks = template.tasks.map(
-        (task, index) => ({
-          id: Date.now() + index,
-          ...task,
-          done: false,
-        })
-      );
+  function loadTemplate(template) {
+    const loadedTasks = template.tasks.map(
+      (task, index) => ({
+        id: Date.now() + index,
+        ...task,
+        done: false,
+      })
+    );
 
-      setTasks(loadedTasks);
-    }
+    setTasks(loadedTasks);
+  }
 
-    function deleteTemplate(id) {
-      setCustomTemplates((current) =>
-        current.filter(
-          (template) => template.id !== id
-        )
-      );
-    }
+  function deleteTemplate(id) {
+    setCustomTemplates((current) =>
+      current.filter(
+        (template) => template.id !== id
+      )
+    );
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -519,6 +561,11 @@ ${generatorNotes.avoid}
           })}
         </div>
       </section>
+
+      <StyleProfile
+        styleProfile={styleProfile}
+        setStyleProfile={setStyleProfile}
+      />
 
       <TemplateLibrary
         customTemplates={customTemplates}
