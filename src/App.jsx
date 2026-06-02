@@ -99,6 +99,9 @@ function App() {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+ 
+ 
+ //usestates 
   const [selectedTemplate, setSelectedTemplate] =
     useState("lowEnergy");
 
@@ -231,6 +234,37 @@ function App() {
     },
   ]);
 
+  const [contentProjects, setContentProjects] = useState(() => {
+  const saved = localStorage.getItem(
+    "planweiser-content-projects"
+  );
+
+  return saved
+    ? JSON.parse(saved)
+    : [
+        {
+          id: Date.now(),
+          name: "Thee Zombie Apocalypse",
+          tone:
+            "funny, heavy, witty, direct",
+          notes:
+            "Promote songs and build audience.",
+          platforms: [
+            {
+              id: 1,
+              platform: "Instagram",
+              frequency: 3,
+            },
+            {
+              id: 2,
+              platform: "Threads",
+              frequency: 7,
+            },
+          ],
+        },
+      ];
+});
+
 
   //useeffects
 
@@ -277,6 +311,13 @@ function App() {
       avoid: styleProfile.avoid,
     }));
   }, [styleProfile]);
+
+  useEffect(() => {
+  localStorage.setItem(
+    "planweiser-content-projects",
+    JSON.stringify(contentProjects)
+  );
+}, [contentProjects]);
 
   //functions
 
