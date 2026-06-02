@@ -197,8 +197,42 @@ function App() {
         };
     });
 
+    const [contentProjects, setContentProjects] =
+  useState([
+    {
+      id: "tza",
+      name: "Thee Zombie Apocalypse",
 
-//useeffects
+      tone:
+        "funny, heavy, witty, direct",
+
+      notes:
+        "Promote music releases and build audience.",
+
+      platforms: [
+        {
+          platform: "Instagram",
+          frequency: 3,
+          days: ["Tue", "Thu", "Sat"],
+        },
+
+        {
+          platform: "Threads",
+          frequency: 7,
+          days: [],
+        },
+
+        {
+          platform: "TikTok",
+          frequency: 2,
+          days: [],
+        },
+      ],
+    },
+  ]);
+
+
+  //useeffects
 
   useEffect(() => {
     localStorage.setItem(
@@ -407,6 +441,23 @@ function App() {
   function generateFromTemplate() {
     const selected = templates[selectedTemplate];
 
+    const contextNote = `
+STYLE
+${styleProfile.tone}
+
+GOAL
+${styleProfile.goal}
+
+MUST INCLUDE
+${styleProfile.mustInclude}
+
+AVOID
+${styleProfile.avoid}
+
+CUSTOM DIRECTION
+${generatorNotes.customDirection}
+`;
+
     const generated = selected.tasks.map((task, index) => ({
       id: Date.now() + index,
       ...task,
@@ -421,7 +472,16 @@ ${generatorNotes.mustInclude}
 
 Avoid:
 ${generatorNotes.avoid}
+
 `.trim(),
+
+note: `
+${task.note}
+
+${contextNote}
+`.trim(),
+
+
       done: false,
     }));
 
