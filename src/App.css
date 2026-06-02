@@ -409,6 +409,28 @@ h1 {
   align-items: center;
 }
 
+.mini-form {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.mini-form input,
+.mini-form textarea {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fffaf1;
+  font: inherit;
+}
+
+.mini-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
 @media (max-width: 850px) {
   .hero,
   .project-grid {

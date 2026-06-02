@@ -11,6 +11,7 @@ import ArchiveSection from "./components/ArchiveSection";
 import InsightsPanel from "./components/InsightsPanel";
 import TemplateLibrary from "./components/TemplateLibrary";
 import StyleProfile from "./components/StyleProfile";
+import ProjectManager from "./components/ProjectManager";
 
 const projects = [
   {
@@ -99,9 +100,9 @@ function App() {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
- 
- 
- //usestates 
+
+
+  //usestates 
   const [selectedTemplate, setSelectedTemplate] =
     useState("lowEnergy");
 
@@ -200,41 +201,8 @@ function App() {
         };
     });
 
-    const [contentProjects, setContentProjects] =
-  useState([
-    {
-      id: "tza",
-      name: "Thee Zombie Apocalypse",
 
-      tone:
-        "funny, heavy, witty, direct",
-
-      notes:
-        "Promote music releases and build audience.",
-
-      platforms: [
-        {
-          platform: "Instagram",
-          frequency: 3,
-          days: ["Tue", "Thu", "Sat"],
-        },
-
-        {
-          platform: "Threads",
-          frequency: 7,
-          days: [],
-        },
-
-        {
-          platform: "TikTok",
-          frequency: 2,
-          days: [],
-        },
-      ],
-    },
-  ]);
-
-  const [contentProjects, setContentProjects] = useState(() => {
+const [contentProjects, setContentProjects] = useState(() => {
   const saved = localStorage.getItem(
     "planweiser-content-projects"
   );
@@ -265,6 +233,12 @@ function App() {
       ];
 });
 
+
+const [newProject, setNewProject] = useState({
+  name: "",
+  tone: "",
+  notes: "",
+});
 
   //useeffects
 
@@ -313,11 +287,11 @@ function App() {
   }, [styleProfile]);
 
   useEffect(() => {
-  localStorage.setItem(
-    "planweiser-content-projects",
-    JSON.stringify(contentProjects)
-  );
-}, [contentProjects]);
+    localStorage.setItem(
+      "planweiser-content-projects",
+      JSON.stringify(contentProjects)
+    );
+  }, [contentProjects]);
 
   //functions
 
@@ -516,7 +490,7 @@ ${generatorNotes.avoid}
 
 `.trim(),
 
-note: `
+      note: `
 ${task.note}
 
 ${contextNote}
@@ -544,6 +518,28 @@ ${contextNote}
     setArchives((current) => [archive, ...current]);
     setTasks([]);
   }
+
+  function addContentProject(event) {
+  event.preventDefault();
+
+  if (!newProject.name.trim()) return;
+
+  const project = {
+    id: Date.now(),
+    name: newProject.name,
+    tone: newProject.tone || styleProfile.tone,
+    notes: newProject.notes,
+    platforms: [],
+  };
+
+  setContentProjects((current) => [project, ...current]);
+
+  setNewProject({
+    name: "",
+    tone: "",
+    notes: "",
+  });
+}
 
   return (
     <main className="app-shell">
@@ -662,6 +658,13 @@ ${contextNote}
           })}
         </div>
       </section>
+
+<ProjectManager
+  contentProjects={contentProjects}
+  newProject={newProject}
+  setNewProject={setNewProject}
+  addContentProject={addContentProject}
+/>
 
       <StyleProfile
         styleProfile={styleProfile}
