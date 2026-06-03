@@ -661,6 +661,7 @@ ${contextNote}
 
 <ProjectManager
   contentProjects={contentProjects}
+  setContentProjects={setContentProjects}
   newProject={newProject}
   setNewProject={setNewProject}
   addContentProject={addContentProject}

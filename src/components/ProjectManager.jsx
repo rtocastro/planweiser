@@ -1,5 +1,17 @@
+const platformOptions = [
+  "Instagram",
+  "Threads",
+  "TikTok",
+  "YouTube",
+  "Facebook",
+  "X / Twitter",
+  "LinkedIn",
+  "Blog",
+];
+
 function ProjectManager({
   contentProjects,
+  setContentProjects,
   newProject,
   setNewProject,
   addContentProject,
@@ -9,6 +21,65 @@ function ProjectManager({
       ...current,
       [field]: value,
     }));
+  }
+
+  function addPlatform(projectId) {
+    setContentProjects((current) =>
+      current.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              platforms: [
+                ...project.platforms,
+                {
+                  id: Date.now(),
+                  platform: "Instagram",
+                  frequency: 1,
+                  contentType: "Post",
+                },
+              ],
+            }
+          : project
+      )
+    );
+  }
+
+  function updatePlatform(projectId, platformId, field, value) {
+    setContentProjects((current) =>
+      current.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              platforms: project.platforms.map((platform) =>
+                platform.id === platformId
+                  ? {
+                      ...platform,
+                      [field]:
+                        field === "frequency"
+                          ? Number(value)
+                          : value,
+                    }
+                  : platform
+              ),
+            }
+          : project
+      )
+    );
+  }
+
+  function deletePlatform(projectId, platformId) {
+    setContentProjects((current) =>
+      current.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              platforms: project.platforms.filter(
+                (platform) => platform.id !== platformId
+              ),
+            }
+          : project
+      )
+    );
   }
 
   return (
@@ -43,7 +114,76 @@ function ProjectManager({
           <article className="archive-card" key={project.id}>
             <strong>{project.name}</strong>
             <p>Tone: {project.tone}</p>
-            <p>Platforms: {project.platforms.length}</p>
+            <p>{project.notes}</p>
+
+            <div className="platform-list">
+              {project.platforms.map((platform) => (
+                <div className="platform-row" key={platform.id}>
+                  <select
+                    value={platform.platform}
+                    onChange={(e) =>
+                      updatePlatform(
+                        project.id,
+                        platform.id,
+                        "platform",
+                        e.target.value
+                      )
+                    }
+                  >
+                    {platformOptions.map((option) => (
+                      <option key={option}>{option}</option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="number"
+                    min="1"
+                    value={platform.frequency}
+                    onChange={(e) =>
+                      updatePlatform(
+                        project.id,
+                        platform.id,
+                        "frequency",
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <span>x/week</span>
+
+                  <input
+                    value={platform.contentType}
+                    onChange={(e) =>
+                      updatePlatform(
+                        project.id,
+                        platform.id,
+                        "contentType",
+                        e.target.value
+                      )
+                    }
+                    placeholder="Post, Reel, Short..."
+                  />
+
+                  <button
+                    className="danger-button"
+                    type="button"
+                    onClick={() =>
+                      deletePlatform(project.id, platform.id)
+                    }
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() => addPlatform(project.id)}
+            >
+              + Add Platform
+            </button>
           </article>
         ))}
       </div>

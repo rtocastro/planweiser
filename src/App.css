@@ -431,6 +431,36 @@ h1 {
   resize: vertical;
 }
 
+.platform-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.platform-row {
+  display: grid;
+  grid-template-columns: 1fr 80px auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.platform-row input,
+.platform-row select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fffaf1;
+  font: inherit;
+}
+
+.platform-row span {
+  color: #d8cfc4;
+  font-weight: 800;
+}
+
+
 @media (max-width: 850px) {
   .hero,
   .project-grid {
@@ -462,5 +492,9 @@ h1 {
 
   .task-actions button {
     flex: 1;
+  }
+
+    .platform-row {
+    grid-template-columns: 1fr;
   }
 }
