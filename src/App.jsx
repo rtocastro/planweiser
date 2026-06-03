@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { templates } from "./data/templates";
 import "./App.css";
 
-//components
+// components
 import TaskCard from "./components/TaskCard";
 import GeneratorModal from "./components/GeneratorModal";
 import AddMoveModal from "./components/AddMoveModal";
@@ -89,22 +89,14 @@ const emptyMove = {
   note: "",
 };
 
-
-
-
 function App() {
-
   const [activeProject, setActiveProject] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-
-
-  //usestates 
-  const [selectedTemplate, setSelectedTemplate] =
-    useState("lowEnergy");
+  const [selectedTemplate, setSelectedTemplate] = useState("lowEnergy");
 
   const [generatorSettings, setGeneratorSettings] = useState({
     energy: "medium",
@@ -113,8 +105,21 @@ function App() {
     tone: "funny",
   });
 
-  const [newTemplateName, setNewTemplateName] =
-    useState("");
+  const [newTemplateName, setNewTemplateName] = useState("");
+
+  const [styleProfile, setStyleProfile] = useState(() => {
+    const saved = localStorage.getItem("planweiser-style-profile");
+
+    return saved
+      ? JSON.parse(saved)
+      : {
+          tone:
+            "funny, quirky, witty, light motivation, slightly unhinged",
+          mustInclude: "Geek-E Garments, TZA, personal creativity",
+          avoid: "salesy, cryptic, burnout vibes, overexplaining",
+          goal: "consistency and growth",
+        };
+  });
 
   const [generatorNotes, setGeneratorNotes] = useState(() => {
     const saved = localStorage.getItem("planweiser-generator-notes");
@@ -122,15 +127,15 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        customDirection: styleProfile?.tone || "",
-        mustInclude: styleProfile?.mustInclude || "",
-        avoid: styleProfile?.avoid || "",
-      };
+          customDirection:
+            "funny, quirky, witty, light motivation, slightly unhinged",
+          mustInclude: "Geek-E Garments, TZA, personal creativity",
+          avoid: "salesy, cryptic, burnout vibes, overexplaining",
+        };
   });
 
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("planweiser-tasks");
-
     return saved ? JSON.parse(saved) : starterTasks;
   });
 
@@ -140,15 +145,42 @@ function App() {
   });
 
   const [customTemplates, setCustomTemplates] = useState(() => {
-    const saved = localStorage.getItem(
-      "planweiser-custom-templates"
-    );
+    const saved = localStorage.getItem("planweiser-custom-templates");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [contentProjects, setContentProjects] = useState(() => {
+    const saved = localStorage.getItem("planweiser-content-projects");
 
     return saved
       ? JSON.parse(saved)
-      : [];
+      : [
+          {
+            id: Date.now(),
+            name: "Thee Zombie Apocalypse",
+            tone: "funny, heavy, witty, direct",
+            notes: "Promote songs and build audience.",
+            platforms: [
+              {
+                id: 1,
+                platform: "Instagram",
+                frequency: 3,
+              },
+              {
+                id: 2,
+                platform: "Threads",
+                frequency: 7,
+              },
+            ],
+          },
+        ];
   });
 
+  const [newProject, setNewProject] = useState({
+    name: "",
+    tone: "",
+    notes: "",
+  });
 
   const filteredTasks = useMemo(() => {
     if (activeProject === "all") return tasks;
@@ -156,6 +188,7 @@ function App() {
   }, [activeProject, tasks]);
 
   const completed = tasks.filter((task) => task.done).length;
+
   const progress = tasks.length
     ? Math.round((completed / tasks.length) * 100)
     : 0;
@@ -166,94 +199,23 @@ function App() {
     switch (task.type.toLowerCase()) {
       case "instagram":
         return total + 10;
-
       case "threads":
         return total + 5;
-
       case "instagram reel":
         return total + 15;
-
       case "task":
         return total + 3;
-
       default:
         return total + 5;
     }
   }, 0);
 
-  const [styleProfile, setStyleProfile] =
-    useState(() => {
-      const saved = localStorage.getItem(
-        "planweiser-style-profile"
-      );
-
-      return saved
-        ? JSON.parse(saved)
-        : {
-          tone:
-            "funny, quirky, witty, light motivation, slightly unhinged",
-          mustInclude:
-            "Geek-E Garments, TZA, personal creativity",
-          avoid:
-            "salesy, cryptic, burnout vibes, overexplaining",
-          goal:
-            "consistency and growth",
-        };
-    });
-
-
-const [contentProjects, setContentProjects] = useState(() => {
-  const saved = localStorage.getItem(
-    "planweiser-content-projects"
-  );
-
-  return saved
-    ? JSON.parse(saved)
-    : [
-        {
-          id: Date.now(),
-          name: "Thee Zombie Apocalypse",
-          tone:
-            "funny, heavy, witty, direct",
-          notes:
-            "Promote songs and build audience.",
-          platforms: [
-            {
-              id: 1,
-              platform: "Instagram",
-              frequency: 3,
-            },
-            {
-              id: 2,
-              platform: "Threads",
-              frequency: 7,
-            },
-          ],
-        },
-      ];
-});
-
-
-const [newProject, setNewProject] = useState({
-  name: "",
-  tone: "",
-  notes: "",
-});
-
-  //useeffects
-
   useEffect(() => {
-    localStorage.setItem(
-      "planweiser-tasks",
-      JSON.stringify(tasks)
-    );
+    localStorage.setItem("planweiser-tasks", JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "planweiser-archives",
-      JSON.stringify(archives)
-    );
+    localStorage.setItem("planweiser-archives", JSON.stringify(archives));
   }, [archives]);
 
   useEffect(() => {
@@ -293,8 +255,6 @@ const [newProject, setNewProject] = useState({
     );
   }, [contentProjects]);
 
-  //functions
-
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
@@ -312,9 +272,7 @@ const [newProject, setNewProject] = useState({
   function toggleTask(id) {
     setTasks((current) =>
       current.map((task) =>
-        task.id === id
-          ? { ...task, done: !task.done }
-          : task
+        task.id === id ? { ...task, done: !task.done } : task
       )
     );
   }
@@ -335,31 +293,23 @@ const [newProject, setNewProject] = useState({
       })),
     };
 
-    setCustomTemplates((current) => [
-      template,
-      ...current,
-    ]);
-
+    setCustomTemplates((current) => [template, ...current]);
     setNewTemplateName("");
   }
 
   function loadTemplate(template) {
-    const loadedTasks = template.tasks.map(
-      (task, index) => ({
-        id: Date.now() + index,
-        ...task,
-        done: false,
-      })
-    );
+    const loadedTasks = template.tasks.map((task, index) => ({
+      id: Date.now() + index,
+      ...task,
+      done: false,
+    }));
 
     setTasks(loadedTasks);
   }
 
   function deleteTemplate(id) {
     setCustomTemplates((current) =>
-      current.filter(
-        (template) => template.id !== id
-      )
+      current.filter((template) => template.id !== id)
     );
   }
 
@@ -386,7 +336,6 @@ const [newProject, setNewProject] = useState({
     setNewMove(emptyMove);
     setIsModalOpen(false);
   }
-
 
   function generateWeek() {
     const generated = [];
@@ -449,7 +398,6 @@ const [newProject, setNewProject] = useState({
     }
 
     setTasks((current) => [...generated, ...current]);
-
     setIsGeneratorOpen(false);
   }
 
@@ -479,24 +427,8 @@ ${generatorNotes.customDirection}
       note: `
 ${task.note}
 
-Direction:
-${generatorNotes.customDirection}
-
-Must Include:
-${generatorNotes.mustInclude}
-
-Avoid:
-${generatorNotes.avoid}
-
-`.trim(),
-
-      note: `
-${task.note}
-
 ${contextNote}
 `.trim(),
-
-
       done: false,
     }));
 
@@ -520,26 +452,26 @@ ${contextNote}
   }
 
   function addContentProject(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (!newProject.name.trim()) return;
+    if (!newProject.name.trim()) return;
 
-  const project = {
-    id: Date.now(),
-    name: newProject.name,
-    tone: newProject.tone || styleProfile.tone,
-    notes: newProject.notes,
-    platforms: [],
-  };
+    const project = {
+      id: Date.now(),
+      name: newProject.name,
+      tone: newProject.tone || styleProfile.tone,
+      notes: newProject.notes,
+      platforms: [],
+    };
 
-  setContentProjects((current) => [project, ...current]);
+    setContentProjects((current) => [project, ...current]);
 
-  setNewProject({
-    name: "",
-    tone: "",
-    notes: "",
-  });
-}
+    setNewProject({
+      name: "",
+      tone: "",
+      notes: "",
+    });
+  }
 
   return (
     <main className="app-shell">
@@ -556,9 +488,11 @@ ${contextNote}
         <div className="progress-card">
           <span>Weekly Progress</span>
           <strong>{progress}%</strong>
+
           <div className="progress-track">
             <div style={{ width: `${progress}%` }} />
           </div>
+
           <p>
             {completed} of {tasks.length} moves completed
           </p>
@@ -585,8 +519,9 @@ ${contextNote}
         {projects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${project.color} ${activeProject === project.id ? "active" : ""
-              }`}
+            className={`project-card ${project.color} ${
+              activeProject === project.id ? "active" : ""
+            }`}
             onClick={() => setActiveProject(project.id)}
           >
             <span>{project.emoji}</span>
@@ -618,23 +553,19 @@ ${contextNote}
               + Add Move
             </button>
 
-            <button
-              className="ghost-button"
-              onClick={saveCurrentAsTemplate}
-            >
+            <button className="ghost-button" onClick={saveCurrentAsTemplate}>
               Save As Template
             </button>
 
             <button className="ghost-button danger-button" onClick={archiveWeek}>
               Archive Week
             </button>
+
             <input
               className="template-input"
               placeholder="PSPSPS Push Week"
               value={newTemplateName}
-              onChange={(e) =>
-                setNewTemplateName(e.target.value)
-              }
+              onChange={(e) => setNewTemplateName(e.target.value)}
             />
           </div>
         </div>
@@ -659,13 +590,13 @@ ${contextNote}
         </div>
       </section>
 
-<ProjectManager
-  contentProjects={contentProjects}
-  setContentProjects={setContentProjects}
-  newProject={newProject}
-  setNewProject={setNewProject}
-  addContentProject={addContentProject}
-/>
+      <ProjectManager
+        contentProjects={contentProjects}
+        setContentProjects={setContentProjects}
+        newProject={newProject}
+        setNewProject={setNewProject}
+        addContentProject={addContentProject}
+      />
 
       <StyleProfile
         styleProfile={styleProfile}

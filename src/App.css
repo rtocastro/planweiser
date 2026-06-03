@@ -460,6 +460,58 @@ h1 {
   font-weight: 800;
 }
 
+.cadence-row {
+  grid-template-columns: 1fr 1fr 80px auto 1fr auto auto;
+}
+
+.slot-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.slot-picker label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #d8cfc4;
+  font-weight: 800;
+}
+
+.slot-picker input {
+  width: auto;
+}
+
+.purpose-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.purpose-picker label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #d8cfc4;
+  font-size: 0.9rem;
+}
+
+
+.day-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.day-picker label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #d8cfc4;
+  font-size: 0.9rem;
+}
 
 @media (max-width: 850px) {
   .hero,
@@ -495,6 +547,10 @@ h1 {
   }
 
     .platform-row {
+    grid-template-columns: 1fr;
+  }
+
+    .cadence-row {
     grid-template-columns: 1fr;
   }
 }
