@@ -475,7 +475,45 @@ ${contextNote}
     });
   }
 
+function getIdeaFromPurpose(platform) {
+  const purposes = platform.purposes || [];
 
+  if (purposes.includes("Sales")) {
+    return "Show the product or offer in a casual, non-pushy way.";
+  }
+
+  if (purposes.includes("Engagement")) {
+    return "Ask a relatable question or start a quick conversation.";
+  }
+
+  if (purposes.includes("Community")) {
+    return "Invite people to share their own experience or opinion.";
+  }
+
+  if (purposes.includes("Brand Building")) {
+    return "Share a behind-the-scenes or personality-driven moment.";
+  }
+
+  if (purposes.includes("Education")) {
+    return "Teach one small useful thing related to this project.";
+  }
+
+  if (purposes.includes("Traffic")) {
+    return "Point people toward a link, post, video, or product page.";
+  }
+
+  return "Share a simple update that keeps momentum going.";
+}
+
+function getCaptionDraft(project, platform, slot = "") {
+  const purposes = (platform.purposes || []).join(", ") || "general";
+
+  return `Draft a ${platform.contentType || "post"} for ${
+    project.name
+  } on ${platform.platform}${
+    slot ? ` during the ${slot.toLowerCase()}` : ""
+  }. Keep it ${project.tone}. Purpose: ${purposes}.`;
+}
 
   function generateCalendarFromProjects() {
     const dayMap = {
@@ -535,6 +573,11 @@ Notes:
 ${project.notes}
 `.trim(),
 
+idea: getIdeaFromPurpose(platform),
+captionDraft: getCaptionDraft(project, platform, slot),
+finalCaption: "",
+status: "Drafted",
+
                 done: false,
               });
             });
@@ -569,6 +612,11 @@ ${project.tone}
 Notes:
 ${project.notes}
 `.trim(),
+
+idea: getIdeaFromPurpose(platform),
+captionDraft: getCaptionDraft(project, platform),
+finalCaption: "",
+status: "Drafted",
 
               done: false,
             });

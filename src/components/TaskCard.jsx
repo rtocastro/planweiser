@@ -10,6 +10,30 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
           </p>
           <h3>{task.title}</h3>
           <p>{task.note}</p>
+
+          {task.idea && (
+            <p>
+              <strong>Idea:</strong> {task.idea}
+            </p>
+          )}
+
+          {task.captionDraft && (
+            <p>
+              <strong>Caption Draft:</strong> {task.captionDraft}
+            </p>
+          )}
+
+          {task.finalCaption && (
+            <p>
+              <strong>Final Caption:</strong> {task.finalCaption}
+            </p>
+          )}
+
+          {task.status && (
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+          )}
         </div>
       </div>
 
