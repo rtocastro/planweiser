@@ -1,3 +1,11 @@
+const statusOptions = [
+  "Drafted",
+  "Scheduled",
+  "Posted",
+  "Review Needed",
+  "Archived",
+];
+
 function EditTaskModal({
   editingTask,
   setEditingTask,
@@ -39,7 +47,7 @@ function EditTaskModal({
         <label>
           Title
           <input
-            value={editingTask.title}
+            value={editingTask.title || ""}
             onChange={(e) =>
               updateEditingTask("title", e.target.value)
             }
@@ -47,9 +55,54 @@ function EditTaskModal({
         </label>
 
         <label>
-          Note
+          Idea
           <textarea
-            value={editingTask.note}
+            value={editingTask.idea || ""}
+            onChange={(e) =>
+              updateEditingTask("idea", e.target.value)
+            }
+          />
+        </label>
+
+        <label>
+          Caption Draft
+          <textarea
+            value={editingTask.captionDraft || ""}
+            onChange={(e) =>
+              updateEditingTask("captionDraft", e.target.value)
+            }
+          />
+        </label>
+
+        <label>
+          Final Caption
+          <textarea
+            value={editingTask.finalCaption || ""}
+            onChange={(e) =>
+              updateEditingTask("finalCaption", e.target.value)
+            }
+            placeholder="Paste or write the final version you actually post..."
+          />
+        </label>
+
+        <label>
+          Status
+          <select
+            value={editingTask.status || "Drafted"}
+            onChange={(e) =>
+              updateEditingTask("status", e.target.value)
+            }
+          >
+            {statusOptions.map((status) => (
+              <option key={status}>{status}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          Notes
+          <textarea
+            value={editingTask.note || ""}
             onChange={(e) =>
               updateEditingTask("note", e.target.value)
             }
@@ -59,7 +112,7 @@ function EditTaskModal({
         <label>
           Time
           <input
-            value={editingTask.time}
+            value={editingTask.time || ""}
             onChange={(e) =>
               updateEditingTask("time", e.target.value)
             }
