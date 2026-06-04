@@ -6,6 +6,16 @@ const statusOptions = [
   "Archived",
 ];
 
+const emptyMetrics = {
+  views: "",
+  likes: "",
+  comments: "",
+  shares: "",
+  saves: "",
+  clicks: "",
+  orders: "",
+};
+
 function EditTaskModal({
   editingTask,
   setEditingTask,
@@ -13,10 +23,22 @@ function EditTaskModal({
 }) {
   if (!editingTask) return null;
 
+  const metrics = editingTask.metrics || emptyMetrics;
+
   function updateEditingTask(field, value) {
     setEditingTask((current) => ({
       ...current,
       [field]: value,
+    }));
+  }
+
+  function updateMetric(field, value) {
+    setEditingTask((current) => ({
+      ...current,
+      metrics: {
+        ...(current.metrics || emptyMetrics),
+        [field]: value,
+      },
     }));
   }
 
@@ -48,9 +70,7 @@ function EditTaskModal({
           Title
           <input
             value={editingTask.title || ""}
-            onChange={(e) =>
-              updateEditingTask("title", e.target.value)
-            }
+            onChange={(e) => updateEditingTask("title", e.target.value)}
           />
         </label>
 
@@ -58,9 +78,7 @@ function EditTaskModal({
           Idea
           <textarea
             value={editingTask.idea || ""}
-            onChange={(e) =>
-              updateEditingTask("idea", e.target.value)
-            }
+            onChange={(e) => updateEditingTask("idea", e.target.value)}
           />
         </label>
 
@@ -89,9 +107,7 @@ function EditTaskModal({
           Status
           <select
             value={editingTask.status || "Drafted"}
-            onChange={(e) =>
-              updateEditingTask("status", e.target.value)
-            }
+            onChange={(e) => updateEditingTask("status", e.target.value)}
           >
             {statusOptions.map((status) => (
               <option key={status}>{status}</option>
@@ -99,13 +115,25 @@ function EditTaskModal({
           </select>
         </label>
 
+        <div className="metrics-grid">
+          {Object.keys(emptyMetrics).map((metric) => (
+            <label key={metric}>
+              {metric}
+              <input
+                type="number"
+                min="0"
+                value={metrics[metric] || ""}
+                onChange={(e) => updateMetric(metric, e.target.value)}
+              />
+            </label>
+          ))}
+        </div>
+
         <label>
           Notes
           <textarea
             value={editingTask.note || ""}
-            onChange={(e) =>
-              updateEditingTask("note", e.target.value)
-            }
+            onChange={(e) => updateEditingTask("note", e.target.value)}
           />
         </label>
 
@@ -113,9 +141,7 @@ function EditTaskModal({
           Time
           <input
             value={editingTask.time || ""}
-            onChange={(e) =>
-              updateEditingTask("time", e.target.value)
-            }
+            onChange={(e) => updateEditingTask("time", e.target.value)}
           />
         </label>
 
