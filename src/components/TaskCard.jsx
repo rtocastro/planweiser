@@ -2,7 +2,7 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
   return (
     <article className={`task-card ${task.done ? "done" : ""}`}>
       <div className="task-main">
-        <div className="task-badge">{project?.emoji}</div>
+        <div className="task-badge">{project?.emoji || "📁"}</div>
 
         <div>
           <p className="task-meta">

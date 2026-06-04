@@ -475,42 +475,77 @@ ${contextNote}
     });
   }
 
-  
 
-function generateCalendarFromProjects() {
-  const dayMap = {
-    Mon: "Monday",
-    Tue: "Tuesday",
-    Wed: "Wednesday",
-    Thu: "Thursday",
-    Fri: "Friday",
-    Sat: "Saturday",
-    Sun: "Sunday",
-  };
 
-  const slotTimes = {
-    Morning: "9:00 AM",
-    Afternoon: "12:30 PM",
-    Night: "7:17 PM",
-  };
+  function generateCalendarFromProjects() {
+    const dayMap = {
+      Mon: "Monday",
+      Tue: "Tuesday",
+      Wed: "Wednesday",
+      Thu: "Thursday",
+      Fri: "Friday",
+      Sat: "Saturday",
+      Sun: "Sunday",
+    };
 
-  const generatedTasks = [];
+    const slotTimes = {
+      Morning: "9:00 AM",
+      Afternoon: "12:30 PM",
+      Night: "7:17 PM",
+    };
 
-  contentProjects.forEach((project) => {
-    project.platforms.forEach((platform) => {
-      const selectedDays =
-        platform.days?.length > 0
-          ? platform.days
-          : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const generatedTasks = [];
 
-      if (platform.cadence === "daily") {
-        const slots =
-          platform.timeSlots?.length > 0
-            ? platform.timeSlots
-            : ["Morning"];
+    contentProjects.forEach((project) => {
+      project.platforms.forEach((platform) => {
+        const selectedDays =
+          platform.days?.length > 0
+            ? platform.days
+            : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-        selectedDays.forEach((day) => {
-          slots.forEach((slot) => {
+        if (platform.cadence === "daily") {
+          const slots =
+            platform.timeSlots?.length > 0
+              ? platform.timeSlots
+              : ["Morning"];
+
+          selectedDays.forEach((day) => {
+            slots.forEach((slot) => {
+              generatedTasks.push({
+                id: Date.now() + generatedTasks.length,
+
+                projectId: project.id,
+
+                day: dayMap[day],
+
+                time: slotTimes[slot] || "Flexible",
+
+                title: `${platform.platform} • ${slot}`,
+
+                type: platform.platform,
+
+                note: `
+Purpose:
+${(platform.purposes || []).join(", ")}
+
+Tone:
+${project.tone}
+
+Notes:
+${project.notes}
+`.trim(),
+
+                done: false,
+              });
+            });
+          });
+        } else {
+          const weeklyDays = selectedDays.slice(
+            0,
+            platform.frequency || 1
+          );
+
+          weeklyDays.forEach((day) => {
             generatedTasks.push({
               id: Date.now() + generatedTasks.length,
 
@@ -518,9 +553,9 @@ function generateCalendarFromProjects() {
 
               day: dayMap[day],
 
-              time: slotTimes[slot] || "Flexible",
+              time: "Flexible",
 
-              title: `${platform.platform} • ${slot}`,
+              title: `${platform.platform} Content`,
 
               type: platform.platform,
 
@@ -538,50 +573,15 @@ ${project.notes}
               done: false,
             });
           });
-        });
-      } else {
-        const weeklyDays = selectedDays.slice(
-          0,
-          platform.frequency || 1
-        );
-
-        weeklyDays.forEach((day) => {
-          generatedTasks.push({
-            id: Date.now() + generatedTasks.length,
-
-            projectId: project.id,
-
-            day: dayMap[day],
-
-            time: "Flexible",
-
-            title: `${platform.platform} Content`,
-
-            type: platform.platform,
-
-            note: `
-Purpose:
-${(platform.purposes || []).join(", ")}
-
-Tone:
-${project.tone}
-
-Notes:
-${project.notes}
-`.trim(),
-
-            done: false,
-          });
-        });
-      }
+        }
+      });
     });
-  });
 
-  setTasks((current) => [
-    ...generatedTasks,
-    ...current,
-  ]);
-}
+    setTasks((current) => [
+      ...generatedTasks,
+      ...current,
+    ]);
+  }
 
   return (
     <main className="app-shell">
@@ -626,16 +626,26 @@ ${project.notes}
           <p>Everything in one weekly view.</p>
         </button>
 
-        {projects.map((project) => (
+        {contentProjects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${project.color} ${activeProject === project.id ? "active" : ""
+            className={`project-card ${activeProject === project.id
+              ? "active"
+              : ""
               }`}
-            onClick={() => setActiveProject(project.id)}
+            onClick={() =>
+              setActiveProject(project.id)
+            }
           >
-            <span>{project.emoji}</span>
+            <span>📁</span>
+
             <h3>{project.name}</h3>
-            <p>{project.vibe}</p>
+
+            <p>
+              {project.platforms?.length || 0}
+              {" "}
+              platforms
+            </p>
           </button>
         ))}
       </section>
@@ -688,9 +698,11 @@ ${project.notes}
 
         <div className="task-list">
           {filteredTasks.map((task) => {
-            const project = projects.find(
-              (item) => item.id === task.projectId
-            );
+            const project =
+              contentProjects.find(
+                (item) =>
+                  item.id === task.projectId
+              );
 
             return (
               <TaskCard
