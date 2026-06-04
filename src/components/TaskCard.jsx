@@ -1,15 +1,37 @@
+const statusStyles = {
+  Drafted: "status-drafted",
+  Scheduled: "status-scheduled",
+  Posted: "status-posted",
+  "Review Needed": "status-review",
+  Archived: "status-archived",
+};
+
+const statusEmoji = {
+  Drafted: "🟡",
+  Scheduled: "🔵",
+  Posted: "🟢",
+  "Review Needed": "🟠",
+  Archived: "📦",
+};
+
 function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
+  const status = task.status || (task.done ? "Posted" : "Drafted");
+
   return (
     <article className={`task-card ${task.done ? "done" : ""}`}>
       <div className="task-main">
         <div className="task-badge">{project?.emoji || "📁"}</div>
 
         <div>
+          <div className={`status-pill ${statusStyles[status] || ""}`}>
+            {statusEmoji[status] || "⚪"} {status}
+          </div>
+
           <p className="task-meta">
             {task.day} · {task.time} · {task.type}
           </p>
+
           <h3>{task.title}</h3>
-          <p>{task.note}</p>
 
           {task.idea && (
             <p>
@@ -29,11 +51,7 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
             </p>
           )}
 
-          {task.status && (
-            <p>
-              <strong>Status:</strong> {task.status}
-            </p>
-          )}
+          <p>{task.note}</p>
         </div>
       </div>
 
