@@ -113,12 +113,12 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-          tone:
-            "funny, quirky, witty, light motivation, slightly unhinged",
-          mustInclude: "Geek-E Garments, TZA, personal creativity",
-          avoid: "salesy, cryptic, burnout vibes, overexplaining",
-          goal: "consistency and growth",
-        };
+        tone:
+          "funny, quirky, witty, light motivation, slightly unhinged",
+        mustInclude: "Geek-E Garments, TZA, personal creativity",
+        avoid: "salesy, cryptic, burnout vibes, overexplaining",
+        goal: "consistency and growth",
+      };
   });
 
   const [generatorNotes, setGeneratorNotes] = useState(() => {
@@ -127,11 +127,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-          customDirection:
-            "funny, quirky, witty, light motivation, slightly unhinged",
-          mustInclude: "Geek-E Garments, TZA, personal creativity",
-          avoid: "salesy, cryptic, burnout vibes, overexplaining",
-        };
+        customDirection:
+          "funny, quirky, witty, light motivation, slightly unhinged",
+        mustInclude: "Geek-E Garments, TZA, personal creativity",
+        avoid: "salesy, cryptic, burnout vibes, overexplaining",
+      };
   });
 
   const [tasks, setTasks] = useState(() => {
@@ -155,25 +155,25 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : [
-          {
-            id: Date.now(),
-            name: "Thee Zombie Apocalypse",
-            tone: "funny, heavy, witty, direct",
-            notes: "Promote songs and build audience.",
-            platforms: [
-              {
-                id: 1,
-                platform: "Instagram",
-                frequency: 3,
-              },
-              {
-                id: 2,
-                platform: "Threads",
-                frequency: 7,
-              },
-            ],
-          },
-        ];
+        {
+          id: Date.now(),
+          name: "Thee Zombie Apocalypse",
+          tone: "funny, heavy, witty, direct",
+          notes: "Promote songs and build audience.",
+          platforms: [
+            {
+              id: 1,
+              platform: "Instagram",
+              frequency: 3,
+            },
+            {
+              id: 2,
+              platform: "Threads",
+              frequency: 7,
+            },
+          ],
+        },
+      ];
   });
 
   const [newProject, setNewProject] = useState({
@@ -464,6 +464,8 @@ ${contextNote}
       platforms: [],
     };
 
+
+
     setContentProjects((current) => [project, ...current]);
 
     setNewProject({
@@ -472,6 +474,114 @@ ${contextNote}
       notes: "",
     });
   }
+
+  
+
+function generateCalendarFromProjects() {
+  const dayMap = {
+    Mon: "Monday",
+    Tue: "Tuesday",
+    Wed: "Wednesday",
+    Thu: "Thursday",
+    Fri: "Friday",
+    Sat: "Saturday",
+    Sun: "Sunday",
+  };
+
+  const slotTimes = {
+    Morning: "9:00 AM",
+    Afternoon: "12:30 PM",
+    Night: "7:17 PM",
+  };
+
+  const generatedTasks = [];
+
+  contentProjects.forEach((project) => {
+    project.platforms.forEach((platform) => {
+      const selectedDays =
+        platform.days?.length > 0
+          ? platform.days
+          : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+      if (platform.cadence === "daily") {
+        const slots =
+          platform.timeSlots?.length > 0
+            ? platform.timeSlots
+            : ["Morning"];
+
+        selectedDays.forEach((day) => {
+          slots.forEach((slot) => {
+            generatedTasks.push({
+              id: Date.now() + generatedTasks.length,
+
+              projectId: project.id,
+
+              day: dayMap[day],
+
+              time: slotTimes[slot] || "Flexible",
+
+              title: `${platform.platform} • ${slot}`,
+
+              type: platform.platform,
+
+              note: `
+Purpose:
+${(platform.purposes || []).join(", ")}
+
+Tone:
+${project.tone}
+
+Notes:
+${project.notes}
+`.trim(),
+
+              done: false,
+            });
+          });
+        });
+      } else {
+        const weeklyDays = selectedDays.slice(
+          0,
+          platform.frequency || 1
+        );
+
+        weeklyDays.forEach((day) => {
+          generatedTasks.push({
+            id: Date.now() + generatedTasks.length,
+
+            projectId: project.id,
+
+            day: dayMap[day],
+
+            time: "Flexible",
+
+            title: `${platform.platform} Content`,
+
+            type: platform.platform,
+
+            note: `
+Purpose:
+${(platform.purposes || []).join(", ")}
+
+Tone:
+${project.tone}
+
+Notes:
+${project.notes}
+`.trim(),
+
+            done: false,
+          });
+        });
+      }
+    });
+  });
+
+  setTasks((current) => [
+    ...generatedTasks,
+    ...current,
+  ]);
+}
 
   return (
     <main className="app-shell">
@@ -519,9 +629,8 @@ ${contextNote}
         {projects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${project.color} ${
-              activeProject === project.id ? "active" : ""
-            }`}
+            className={`project-card ${project.color} ${activeProject === project.id ? "active" : ""
+              }`}
             onClick={() => setActiveProject(project.id)}
           >
             <span>{project.emoji}</span>
@@ -544,6 +653,13 @@ ${contextNote}
               onClick={() => setIsGeneratorOpen(true)}
             >
               ⚡ Generate Week
+            </button>
+
+            <button
+              className="ghost-button"
+              onClick={generateCalendarFromProjects}
+            >
+              ⚡ Generate Calendar
             </button>
 
             <button
