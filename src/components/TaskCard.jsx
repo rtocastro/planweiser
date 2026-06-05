@@ -84,6 +84,41 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
             </div>
           )}
 
+          {task.metrics &&
+  Object.values(task.metrics).some(
+    (value) => value !== "" && value !== 0
+  ) && (
+    <div className="metrics-summary">
+      {task.metrics.views && (
+        <span>👀 {task.metrics.views}</span>
+      )}
+
+      {task.metrics.likes && (
+        <span>❤️ {task.metrics.likes}</span>
+      )}
+
+      {task.metrics.comments && (
+        <span>💬 {task.metrics.comments}</span>
+      )}
+
+      {task.metrics.shares && (
+        <span>🔁 {task.metrics.shares}</span>
+      )}
+
+      {task.metrics.saves && (
+        <span>🔖 {task.metrics.saves}</span>
+      )}
+
+      {task.metrics.clicks && (
+        <span>🖱️ {task.metrics.clicks}</span>
+      )}
+
+      {task.metrics.orders && (
+        <span>🛒 {task.metrics.orders}</span>
+      )}
+    </div>
+)}
+
           {visibleMetrics.length > 0 && (
             <div className="metrics-summary">
               {visibleMetrics.map(([key, value]) => (

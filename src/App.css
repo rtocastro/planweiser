@@ -597,6 +597,21 @@ h1 {
   font-weight: 800;
 }
 
+.metrics-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.metrics-summary span {
+  background: rgba(255,255,255,0.08);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 @media (max-width: 650px) {
   .metrics-grid {
     grid-template-columns: 1fr;
