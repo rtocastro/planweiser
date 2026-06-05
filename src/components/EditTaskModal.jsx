@@ -115,6 +115,17 @@ function EditTaskModal({
           </select>
         </label>
 
+        <label>
+          Posted Date
+          <input
+            type="date"
+            value={editingTask.postedDate || ""}
+            onChange={(e) =>
+              updateEditingTask("postedDate", e.target.value)
+            }
+          />
+        </label>
+
         <div className="metrics-grid">
           {Object.keys(emptyMetrics).map((metric) => (
             <label key={metric}>
