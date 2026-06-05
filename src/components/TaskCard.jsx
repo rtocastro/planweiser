@@ -14,8 +14,28 @@ const statusEmoji = {
   Archived: "📦",
 };
 
+const metricLabels = {
+  views: "Views",
+  likes: "Likes",
+  comments: "Comments",
+  shares: "Shares",
+  saves: "Saves",
+  clicks: "Clicks",
+  orders: "Orders",
+};
+
 function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
   const status = task.status || (task.done ? "Posted" : "Drafted");
+
+  const visibleMetrics = Object.entries(task.metrics || {}).filter(
+    ([, value]) => value !== "" && value !== null && value !== undefined
+  );
+
+  function copyFinalCaption() {
+    if (!task.finalCaption) return;
+
+    navigator.clipboard.writeText(task.finalCaption);
+  }
 
   return (
     <article className={`task-card ${task.done ? "done" : ""}`}>
@@ -46,9 +66,32 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
           )}
 
           {task.finalCaption && (
-            <p>
-              <strong>Final Caption:</strong> {task.finalCaption}
-            </p>
+            <div className="caption-box">
+              <div className="caption-header">
+                <strong>Final Caption:</strong>
+
+                <button
+                  type="button"
+                  className="copy-button"
+                  onClick={copyFinalCaption}
+                  title="Copy final caption"
+                >
+                  ⧉
+                </button>
+              </div>
+
+              <p>{task.finalCaption}</p>
+            </div>
+          )}
+
+          {visibleMetrics.length > 0 && (
+            <div className="metrics-summary">
+              {visibleMetrics.map(([key, value]) => (
+                <span key={key}>
+                  {metricLabels[key] || key}: {value}
+                </span>
+              ))}
+            </div>
           )}
 
           <p>{task.note}</p>
