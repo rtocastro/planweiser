@@ -14,23 +14,11 @@ const statusEmoji = {
   Archived: "📦",
 };
 
-const metricLabels = {
-  views: "Views",
-  likes: "Likes",
-  comments: "Comments",
-  shares: "Shares",
-  saves: "Saves",
-  clicks: "Clicks",
-  orders: "Orders",
-};
 
 function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
   const status = task.status || (task.done ? "Posted" : "Drafted");
 
-  const visibleMetrics = Object.entries(task.metrics || {}).filter(
-    ([, value]) => value !== "" && value !== null && value !== undefined
-  );
-
+  
   function copyFinalCaption() {
     if (!task.finalCaption) return;
 
@@ -65,69 +53,41 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
             </p>
           )}
 
-          {task.finalCaption && (
-            <div className="caption-box">
-              <div className="caption-header">
-                <strong>Final Caption:</strong>
-
-                <button
-                  type="button"
-                  className="copy-button"
-                  onClick={copyFinalCaption}
-                  title="Copy final caption"
-                >
-                  ⧉
-                </button>
-              </div>
-
-              <p>{task.finalCaption}</p>
-            </div>
-          )}
-
           {task.metrics &&
-  Object.values(task.metrics).some(
-    (value) => value !== "" && value !== 0
-  ) && (
-    <div className="metrics-summary">
-      {task.metrics.views && (
-        <span>👀 {task.metrics.views}</span>
-      )}
+            Object.values(task.metrics).some(
+              (value) => value !== "" && value !== 0
+            ) && (
+              <div className="metrics-summary">
+                {task.metrics.views && (
+                  <span>👀 {task.metrics.views}</span>
+                )}
 
-      {task.metrics.likes && (
-        <span>❤️ {task.metrics.likes}</span>
-      )}
+                {task.metrics.likes && (
+                  <span>❤️ {task.metrics.likes}</span>
+                )}
 
-      {task.metrics.comments && (
-        <span>💬 {task.metrics.comments}</span>
-      )}
+                {task.metrics.comments && (
+                  <span>💬 {task.metrics.comments}</span>
+                )}
 
-      {task.metrics.shares && (
-        <span>🔁 {task.metrics.shares}</span>
-      )}
+                {task.metrics.shares && (
+                  <span>🔁 {task.metrics.shares}</span>
+                )}
 
-      {task.metrics.saves && (
-        <span>🔖 {task.metrics.saves}</span>
-      )}
+                {task.metrics.saves && (
+                  <span>🔖 {task.metrics.saves}</span>
+                )}
 
-      {task.metrics.clicks && (
-        <span>🖱️ {task.metrics.clicks}</span>
-      )}
+                {task.metrics.clicks && (
+                  <span>🖱️ {task.metrics.clicks}</span>
+                )}
 
-      {task.metrics.orders && (
-        <span>🛒 {task.metrics.orders}</span>
-      )}
-    </div>
-)}
+                {task.metrics.orders && (
+                  <span>🛒 {task.metrics.orders}</span>
+                )}
+              </div>
+            )}
 
-          {visibleMetrics.length > 0 && (
-            <div className="metrics-summary">
-              {visibleMetrics.map(([key, value]) => (
-                <span key={key}>
-                  {metricLabels[key] || key}: {value}
-                </span>
-              ))}
-            </div>
-          )}
 
           <p>{task.note}</p>
         </div>
