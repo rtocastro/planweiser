@@ -30,6 +30,47 @@ const dayOptions = [
 
 const timeSlots = ["Morning", "Afternoon", "Night"];
 
+function getProjectEmoji(name = "") {
+  const lower = name.toLowerCase();
+
+  if (
+    lower.includes("zombie") ||
+    lower.includes("apocalypse") ||
+    lower.includes("tza")
+  ) {
+    return "🧟";
+  }
+
+  if (
+    lower.includes("geek") ||
+    lower.includes("garment") ||
+    lower.includes("cat")
+  ) {
+    return "🐾";
+  }
+
+  if (
+    lower.includes("fruit") ||
+    lower.includes("garden") ||
+    lower.includes("plant")
+  ) {
+    return "🌱";
+  }
+
+  if (
+    lower.includes("music") ||
+    lower.includes("band") ||
+    lower.includes("song")
+  ) {
+    return "🎵";
+  }
+
+  if (lower.includes("personal")) return "✨";
+  if (lower.includes("r'to") || lower.includes("arto")) return "🎛️";
+
+  return "📁";
+}
+
 function ProjectManager({
     contentProjects,
     setContentProjects,
@@ -187,6 +228,22 @@ function ProjectManager({
         );
     }
 
+    function deleteProject(projectId) {
+        const confirmed = window.confirm(
+            "Delete this project and all associated platforms?"
+        );
+
+        if (!confirmed) return;
+
+        setContentProjects((current) =>
+            current.filter(
+                (project) => project.id !== projectId
+            )
+        );
+    }
+
+    
+
     return (
         <section className="archive-section">
             <p className="eyebrow">Content Engine</p>
@@ -206,7 +263,7 @@ function ProjectManager({
                 />
 
                 <textarea
-                    placeholder="Notes for the generator..."
+                    placeholder="Campaign notes, assets available, target audience, promotions, content themes...Notes for generator to get ideas from"
                     value={newProject.notes}
                     onChange={(e) => updateProject("notes", e.target.value)}
                 />
@@ -217,7 +274,21 @@ function ProjectManager({
             <div className="archive-list">
                 {contentProjects.map((project) => (
                     <article className="archive-card" key={project.id}>
-                        <strong>{project.name}</strong>
+                        <div className="project-header">
+                            <strong>
+                                {getProjectEmoji(project.name)}
+                                {" "}
+                                {project.name}
+                            </strong>
+
+                            <button
+                                className="danger-button"
+                                type="button"
+                                onClick={() => deleteProject(project.id)}
+                            >
+                                Delete Project
+                            </button>
+                        </div>
                         <p>Tone: {project.tone}</p>
                         <p>{project.notes}</p>
 

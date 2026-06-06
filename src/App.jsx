@@ -90,6 +90,47 @@ const emptyMove = {
   note: "",
 };
 
+function getProjectEmoji(name = "") {
+  const lower = name.toLowerCase();
+
+  if (
+    lower.includes("zombie") ||
+    lower.includes("apocalypse") ||
+    lower.includes("tza")
+  ) {
+    return "🧟";
+  }
+
+  if (
+    lower.includes("geek") ||
+    lower.includes("garment") ||
+    lower.includes("cat")
+  ) {
+    return "🐾";
+  }
+
+  if (
+    lower.includes("fruit") ||
+    lower.includes("garden") ||
+    lower.includes("plant")
+  ) {
+    return "🌱";
+  }
+
+  if (
+    lower.includes("music") ||
+    lower.includes("band") ||
+    lower.includes("song")
+  ) {
+    return "🎵";
+  }
+
+  if (lower.includes("personal")) return "✨";
+  if (lower.includes("r'to") || lower.includes("arto")) return "🎛️";
+
+  return "📁";
+}
+
 function App() {
   const [activeProject, setActiveProject] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -273,33 +314,6 @@ function App() {
         const diffDays = Math.floor(
           (today - postedDate) /
           (1000 * 60 * 60 * 24)
-        );
-
-        if (diffDays >= 7) {
-          return {
-            ...task,
-            status: "Review Needed",
-          };
-        }
-
-        return task;
-      })
-    );
-  }, []);
-
-  useEffect(() => {
-    const today = new Date();
-
-    setTasks((current) =>
-      current.map((task) => {
-        if (task.status !== "Posted" || !task.postedDate) {
-          return task;
-        }
-
-        const postedDate = new Date(task.postedDate);
-
-        const diffDays = Math.floor(
-          (today - postedDate) / (1000 * 60 * 60 * 24)
         );
 
         if (diffDays >= 7) {
@@ -751,7 +765,7 @@ ${project.notes}
               setActiveProject(project.id)
             }
           >
-            <span>📁</span>
+            <span>{getProjectEmoji(project.name)}</span>
 
             <h3>{project.name}</h3>
 
