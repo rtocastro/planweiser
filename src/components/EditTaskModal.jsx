@@ -119,7 +119,11 @@ function EditTaskModal({
           Posted Date
           <input
             type="date"
-            value={editingTask.postedDate || ""}
+            value={
+              editingTask.postedDate ||
+              editingTask.suggestedDate ||
+              ""
+            }
             onChange={(e) =>
               updateEditingTask("postedDate", e.target.value)
             }

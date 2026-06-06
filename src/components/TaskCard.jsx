@@ -18,7 +18,7 @@ const statusEmoji = {
 function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
   const status = task.status || (task.done ? "Posted" : "Drafted");
 
-  
+
   function copyFinalCaption() {
     if (!task.finalCaption) return;
 
@@ -95,6 +95,7 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
 
       <div className="task-actions">
         <button onClick={() => onEdit(task)}>Edit</button>
+
 
         <button onClick={() => onToggle(task.id)}>
           {task.done ? "Done" : "Mark Done"}

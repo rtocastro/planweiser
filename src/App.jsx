@@ -90,6 +90,8 @@ const emptyMove = {
   note: "",
 };
 
+
+
 function getProjectEmoji(name = "") {
   const lower = name.toLowerCase();
 
@@ -137,6 +139,7 @@ function App() {
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [activePlatform, setActivePlatform] = useState("all");
 
   const [selectedTemplate, setSelectedTemplate] = useState("lowEnergy");
 
@@ -225,9 +228,21 @@ function App() {
   });
 
   const filteredTasks = useMemo(() => {
-    if (activeProject === "all") return tasks;
-    return tasks.filter((task) => task.projectId === activeProject);
-  }, [activeProject, tasks]);
+    return tasks.filter((task) => {
+      const matchesProject =
+        activeProject === "all" || task.projectId === activeProject;
+
+      const matchesPlatform =
+        activePlatform === "all" || task.type === activePlatform;
+
+      return matchesProject && matchesPlatform;
+    });
+  }, [activeProject, activePlatform, tasks]);
+
+  const availablePlatforms = useMemo(() => {
+    const platforms = tasks.map((task) => task.type).filter(Boolean);
+    return ["all", ...new Set(platforms)];
+  }, [tasks]);
 
   const completed = tasks.filter((task) => task.done).length;
 
@@ -251,6 +266,7 @@ function App() {
         return total + 5;
     }
   }, 0);
+
 
   useEffect(() => {
     localStorage.setItem("planweiser-tasks", JSON.stringify(tasks));
@@ -327,6 +343,8 @@ function App() {
       })
     );
   }, []);
+
+
 
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
@@ -578,13 +596,58 @@ ${contextNote}
     return "Share a simple update that keeps momentum going.";
   }
 
-  function getCaptionDraft(project, platform, slot = "") {
-    const purposes = (platform.purposes || []).join(", ") || "general";
+function getCaptionDraft(project, platform, slot = "") {
+  const purposes = platform.purposes || [];
+  const platformName = platform.platform;
+  const tone = project.tone || "";
+  const notes = project.notes || "";
 
-    return `Draft a ${platform.contentType || "post"} for ${project.name
-      } on ${platform.platform}${slot ? ` during the ${slot.toLowerCase()}` : ""
-      }. Keep it ${project.tone}. Purpose: ${purposes}.`;
+  if (platformName === "Threads") {
+    if (purposes.includes("Engagement")) {
+      return "I told myself I'd stop starting new projects.\n\nAnyway here's project #47,873,839,007.";
+    }
+
+    if (purposes.includes("Community")) {
+      return "What’s something you’re working on right now that started as “just a quick idea” and became a whole thing?";
+    }
+
+    if (purposes.includes("Brand Building")) {
+      return `Slowly building ${project.name} one tiny chaotic decision at a time.`;
+    }
+
+    return "Small update: still building, still learning, still somehow adding more to the list.";
   }
+
+  if (platformName === "Instagram") {
+    if (purposes.includes("Sales")) {
+      return "Made this one for the people who get it.\n\nLight nudge: it’s up now if you want to check it out.";
+    }
+
+    if (purposes.includes("Brand Building")) {
+      return `A little behind-the-scenes look at what I’m building with ${project.name}.`;
+    }
+
+    if (purposes.includes("Engagement")) {
+      return "Quick question: which one would you pick?";
+    }
+
+    return "A quick snapshot from the week.";
+  }
+
+  if (platformName === "YouTube") {
+    return `New video idea for ${project.name}: a quick look behind the scenes and what went into making this.`;
+  }
+
+  if (platformName === "TikTok") {
+    return "Quick little behind-the-scenes moment because apparently everything is content now.";
+  }
+
+  if (platformName === "Facebook") {
+    return `Sharing a quick update from ${project.name}. More soon.`;
+  }
+
+  return "Small progress update. Nothing fancy, just keeping the momentum going.";
+}
 
   function generateCalendarFromProjects() {
     const dayMap = {
@@ -633,7 +696,18 @@ ${contextNote}
 
                 type: platform.platform,
 
+                suggestedDate: new Date().toISOString().split("T")[0],
+
+                generatorContext: {
+                  project: project.name,
+                  tone: project.tone,
+                  platform: platform.platform,
+                  purposes: platform.purposes || [],
+                  notes: project.notes,
+                },
+
                 note: `
+                
 Purpose:
 ${(platform.purposes || []).join(", ")}
 
@@ -701,6 +775,8 @@ ${project.notes}
       ...current,
     ]);
   }
+
+
 
   return (
     <main className="app-shell">
@@ -774,6 +850,19 @@ ${project.notes}
               {" "}
               platforms
             </p>
+          </button>
+        ))}
+      </section>
+
+      <section className="platform-filter">
+        {availablePlatforms.map((platform) => (
+          <button
+            key={platform}
+            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
+              }`}
+            onClick={() => setActivePlatform(platform)}
+          >
+            {platform === "all" ? "All Platforms" : platform}
           </button>
         ))}
       </section>
