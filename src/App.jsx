@@ -721,6 +721,15 @@ ${project.notes}
         </div>
       </section>
 
+      <section>
+        <div>
+          <StyleProfile
+            styleProfile={styleProfile}
+            setStyleProfile={setStyleProfile}
+          />
+        </div>
+      </section>
+
       <section className="project-grid">
         <button
           className={`project-card ${activeProject === "all" ? "active" : ""}`}
@@ -829,11 +838,6 @@ ${project.notes}
         newProject={newProject}
         setNewProject={setNewProject}
         addContentProject={addContentProject}
-      />
-
-      <StyleProfile
-        styleProfile={styleProfile}
-        setStyleProfile={setStyleProfile}
       />
 
       <TemplateLibrary
