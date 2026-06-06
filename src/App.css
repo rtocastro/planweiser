@@ -612,6 +612,19 @@ h1 {
   font-weight: 700;
 }
 
+.winner-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.winner-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
 @media (max-width: 650px) {
   .metrics-grid {
     grid-template-columns: 1fr;

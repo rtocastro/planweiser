@@ -12,6 +12,7 @@ import InsightsPanel from "./components/InsightsPanel";
 import TemplateLibrary from "./components/TemplateLibrary";
 import StyleProfile from "./components/StyleProfile";
 import ProjectManager from "./components/ProjectManager";
+import WinningContentPanel from "./components/WinningContentPanel";
 
 const projects = [
   {
@@ -255,6 +256,64 @@ function App() {
     );
   }, [contentProjects]);
 
+  useEffect(() => {
+    const today = new Date();
+
+    setTasks((current) =>
+      current.map((task) => {
+        if (
+          task.status !== "Posted" ||
+          !task.postedDate
+        ) {
+          return task;
+        }
+
+        const postedDate = new Date(task.postedDate);
+
+        const diffDays = Math.floor(
+          (today - postedDate) /
+          (1000 * 60 * 60 * 24)
+        );
+
+        if (diffDays >= 7) {
+          return {
+            ...task,
+            status: "Review Needed",
+          };
+        }
+
+        return task;
+      })
+    );
+  }, []);
+
+  useEffect(() => {
+    const today = new Date();
+
+    setTasks((current) =>
+      current.map((task) => {
+        if (task.status !== "Posted" || !task.postedDate) {
+          return task;
+        }
+
+        const postedDate = new Date(task.postedDate);
+
+        const diffDays = Math.floor(
+          (today - postedDate) / (1000 * 60 * 60 * 24)
+        );
+
+        if (diffDays >= 7) {
+          return {
+            ...task,
+            status: "Review Needed",
+          };
+        }
+
+        return task;
+      })
+    );
+  }, []);
+
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
@@ -475,45 +534,43 @@ ${contextNote}
     });
   }
 
-function getIdeaFromPurpose(platform) {
-  const purposes = platform.purposes || [];
+  function getIdeaFromPurpose(platform) {
+    const purposes = platform.purposes || [];
 
-  if (purposes.includes("Sales")) {
-    return "Show the product or offer in a casual, non-pushy way.";
+    if (purposes.includes("Sales")) {
+      return "Show the product or offer in a casual, non-pushy way.";
+    }
+
+    if (purposes.includes("Engagement")) {
+      return "Ask a relatable question or start a quick conversation.";
+    }
+
+    if (purposes.includes("Community")) {
+      return "Invite people to share their own experience or opinion.";
+    }
+
+    if (purposes.includes("Brand Building")) {
+      return "Share a behind-the-scenes or personality-driven moment.";
+    }
+
+    if (purposes.includes("Education")) {
+      return "Teach one small useful thing related to this project.";
+    }
+
+    if (purposes.includes("Traffic")) {
+      return "Point people toward a link, post, video, or product page.";
+    }
+
+    return "Share a simple update that keeps momentum going.";
   }
 
-  if (purposes.includes("Engagement")) {
-    return "Ask a relatable question or start a quick conversation.";
+  function getCaptionDraft(project, platform, slot = "") {
+    const purposes = (platform.purposes || []).join(", ") || "general";
+
+    return `Draft a ${platform.contentType || "post"} for ${project.name
+      } on ${platform.platform}${slot ? ` during the ${slot.toLowerCase()}` : ""
+      }. Keep it ${project.tone}. Purpose: ${purposes}.`;
   }
-
-  if (purposes.includes("Community")) {
-    return "Invite people to share their own experience or opinion.";
-  }
-
-  if (purposes.includes("Brand Building")) {
-    return "Share a behind-the-scenes or personality-driven moment.";
-  }
-
-  if (purposes.includes("Education")) {
-    return "Teach one small useful thing related to this project.";
-  }
-
-  if (purposes.includes("Traffic")) {
-    return "Point people toward a link, post, video, or product page.";
-  }
-
-  return "Share a simple update that keeps momentum going.";
-}
-
-function getCaptionDraft(project, platform, slot = "") {
-  const purposes = (platform.purposes || []).join(", ") || "general";
-
-  return `Draft a ${platform.contentType || "post"} for ${
-    project.name
-  } on ${platform.platform}${
-    slot ? ` during the ${slot.toLowerCase()}` : ""
-  }. Keep it ${project.tone}. Purpose: ${purposes}.`;
-}
 
   function generateCalendarFromProjects() {
     const dayMap = {
@@ -573,10 +630,10 @@ Notes:
 ${project.notes}
 `.trim(),
 
-idea: getIdeaFromPurpose(platform),
-captionDraft: getCaptionDraft(project, platform, slot),
-finalCaption: "",
-status: "Drafted",
+                idea: getIdeaFromPurpose(platform),
+                captionDraft: getCaptionDraft(project, platform, slot),
+                finalCaption: "",
+                status: "Drafted",
 
                 done: false,
               });
@@ -613,10 +670,10 @@ Notes:
 ${project.notes}
 `.trim(),
 
-idea: getIdeaFromPurpose(platform),
-captionDraft: getCaptionDraft(project, platform),
-finalCaption: "",
-status: "Drafted",
+              idea: getIdeaFromPurpose(platform),
+              captionDraft: getCaptionDraft(project, platform),
+              finalCaption: "",
+              status: "Drafted",
 
               done: false,
             });
@@ -788,6 +845,7 @@ status: "Drafted",
       <ArchiveSection archives={archives} />
 
       <InsightsPanel tasks={tasks} />
+      <WinningContentPanel tasks={tasks} />
 
       <GeneratorModal
         isOpen={isGeneratorOpen}
