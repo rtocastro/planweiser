@@ -31,44 +31,44 @@ const dayOptions = [
 const timeSlots = ["Morning", "Afternoon", "Night"];
 
 function getProjectEmoji(name = "") {
-  const lower = name.toLowerCase();
+    const lower = name.toLowerCase();
 
-  if (
-    lower.includes("zombie") ||
-    lower.includes("apocalypse") ||
-    lower.includes("tza")
-  ) {
-    return "🧟";
-  }
+    if (
+        lower.includes("zombie") ||
+        lower.includes("apocalypse") ||
+        lower.includes("tza")
+    ) {
+        return "🧟";
+    }
 
-  if (
-    lower.includes("geek") ||
-    lower.includes("garment") ||
-    lower.includes("cat")
-  ) {
-    return "🐾";
-  }
+    if (
+        lower.includes("geek") ||
+        lower.includes("garment") ||
+        lower.includes("cat")
+    ) {
+        return "🐾";
+    }
 
-  if (
-    lower.includes("fruit") ||
-    lower.includes("garden") ||
-    lower.includes("plant")
-  ) {
-    return "🌱";
-  }
+    if (
+        lower.includes("fruit") ||
+        lower.includes("garden") ||
+        lower.includes("plant")
+    ) {
+        return "🌱";
+    }
 
-  if (
-    lower.includes("music") ||
-    lower.includes("band") ||
-    lower.includes("song")
-  ) {
-    return "🎵";
-  }
+    if (
+        lower.includes("music") ||
+        lower.includes("band") ||
+        lower.includes("song")
+    ) {
+        return "🎵";
+    }
 
-  if (lower.includes("personal")) return "✨";
-  if (lower.includes("r'to") || lower.includes("arto")) return "🎛️";
+    if (lower.includes("personal")) return "✨";
+    if (lower.includes("r'to") || lower.includes("arto")) return "🎛️";
 
-  return "📁";
+    return "📁";
 }
 
 function ProjectManager({
@@ -230,19 +230,21 @@ function ProjectManager({
 
     function deleteProject(projectId) {
         const confirmed = window.confirm(
-            "Delete this project and all associated platforms?"
+            "Delete this project and all associated tasks?"
         );
 
         if (!confirmed) return;
 
         setContentProjects((current) =>
-            current.filter(
-                (project) => project.id !== projectId
-            )
+            current.filter((project) => project.id !== projectId)
+        );
+
+        setTasks((current) =>
+            current.filter((task) => task.projectId !== projectId)
         );
     }
 
-    
+
 
     return (
         <section className="archive-section">
@@ -282,13 +284,15 @@ function ProjectManager({
                             </strong>
 
                             <button
-                                className="danger-button"
                                 type="button"
+                                className="danger-button"
                                 onClick={() => deleteProject(project.id)}
                             >
                                 Delete Project
                             </button>
                         </div>
+
+
                         <p>Tone: {project.tone}</p>
                         <p>{project.notes}</p>
 

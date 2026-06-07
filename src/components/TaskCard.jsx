@@ -78,6 +78,16 @@ function TaskCard({
             )
           )}
 
+{task.aiPrompt && (
+  <details>
+    <summary>🤖 AI Context</summary>
+
+    <pre className="ai-preview">
+      {task.aiPrompt}
+    </pre>
+  </details>
+)}
+
           {task.winnerTags && (
             <p>
               <strong>Tags:</strong> {task.winnerTags}

@@ -581,55 +581,76 @@ ${contextNote}
     return "Share a simple update that keeps momentum going.";
   }
 
-  function getCaptionDraft(project, platform) {
+  function getCaptionDraft(project, platform, slot = "") {
     const purposes = platform.purposes || [];
     const platformName = platform.platform;
+    const projectName = project.name;
+
+    const slotLine = slot ? `${slot} thought:` : "Quick thought:";
 
     if (platformName === "Threads") {
       if (purposes.includes("Engagement")) {
-        return "I told myself I'd stop starting new projects.\n\nAnyway here's project #47,873,839,007.";
+        return `${slotLine}
+
+I told myself I was going to keep this simple.
+
+Anyway, now it has lore.`;
       }
 
       if (purposes.includes("Community")) {
-        return "What’s something you’re working on right now that started as “just a quick idea” and became a whole thing?";
+        return `${slotLine}
+
+What’s something you started as “just a quick idea” that immediately became a whole side quest?`;
       }
 
       if (purposes.includes("Brand Building")) {
-        return `Slowly building ${project.name} one tiny chaotic decision at a time.`;
+        return `${slotLine}
+
+Slowly building ${projectName} one weird little decision at a time.`;
       }
 
-      return "Small update: still building, still learning, still somehow adding more to the list.";
+      return `${slotLine}
+
+Still building. Still learning. Still somehow adding more things to the list.`;
     }
 
     if (platformName === "Instagram") {
+      if (purposes.includes("Engagement")) {
+        return `Quick question:
+
+Which part of this would you notice first?`;
+      }
+
       if (purposes.includes("Sales")) {
-        return "Made this one for the people who get it.\n\nLight nudge: it’s up now if you want to check it out.";
+        return `Made this one for the people who get it.
+
+No hard sell — just putting it where it can be found.`;
       }
 
       if (purposes.includes("Brand Building")) {
-        return `A little behind-the-scenes look at what I’m building with ${project.name}.`;
+        return `A small behind-the-scenes piece of ${projectName}.
+
+Keeping it moving without overthinking it.`;
       }
 
-      if (purposes.includes("Engagement")) {
-        return "Quick question: which one would you pick?";
-      }
+      return `A quick snapshot from the week.
 
-      return "A quick snapshot from the week.";
+Nothing too polished — just part of the process.`;
     }
 
     if (platformName === "YouTube") {
-      return `New video idea for ${project.name}: a quick look behind the scenes and what went into making this.`;
+      return `Quick video idea:
+
+Show one part of ${projectName} people normally do not see, then explain why it matters.`;
     }
 
     if (platformName === "TikTok") {
-      return "Quick little behind-the-scenes moment because apparently everything is content now.";
+      return `Quick behind-the-scenes moment because apparently everything is content now.`;
     }
 
-    if (platformName === "Facebook") {
-      return `Sharing a quick update from ${project.name}. More soon.`;
-    }
+    return `Small progress update for ${projectName}.
 
-    return "Small progress update. Nothing fancy, just keeping the momentum going.";
+Nothing fancy — just keeping momentum going.`;
   }
 
   function getNextDateForDay(dayShort) {
@@ -677,6 +698,78 @@ ${contextNote}
     };
 
     const generatedTasks = [];
+
+    function getWinnerInsights(tasks = []) {
+      const winners = [...tasks]
+        .filter((task) => task.metrics)
+        .sort((a, b) => {
+          const scoreA =
+            Number(a.metrics?.likes || 0) +
+            Number(a.metrics?.comments || 0) * 2 +
+            Number(a.metrics?.shares || 0) * 3;
+
+          const scoreB =
+            Number(b.metrics?.likes || 0) +
+            Number(b.metrics?.comments || 0) * 2 +
+            Number(b.metrics?.shares || 0) * 3;
+
+          return scoreB - scoreA;
+        })
+        .slice(0, 5);
+
+      if (!winners.length) return "No winner history yet.";
+
+      return winners
+        .map(
+          (winner) => `
+Title: ${winner.title}
+Platform: ${winner.type}
+Tags: ${winner.winnerTags || "none"}
+Caption:
+${winner.finalCaption || winner.captionDraft || ""}
+`
+        )
+        .join("\n\n");
+    }
+
+    function buildAIPrompt(taskContext) {
+      return `
+GLOBAL STYLE:
+Tone: ${taskContext.styleProfile?.tone || ""}
+Must include: ${taskContext.styleProfile?.mustInclude || ""}
+Avoid: ${taskContext.styleProfile?.avoid || ""}
+Goal: ${taskContext.styleProfile?.goal || ""}
+
+WEEKLY DIRECTION:
+Custom direction: ${taskContext.generatorNotes?.customDirection || ""}
+Must include: ${taskContext.generatorNotes?.mustInclude || ""}
+Avoid: ${taskContext.generatorNotes?.avoid || ""}
+
+PROJECT:
+Name: ${taskContext.projectName || ""}
+Tone: ${taskContext.projectTone || ""}
+Notes: ${taskContext.projectNotes || ""}
+
+PLATFORM:
+${taskContext.platform || ""}
+
+CONTENT TYPE:
+${taskContext.contentType || ""}
+
+PURPOSE:
+${(taskContext.purposes || []).join(", ")}
+
+SCHEDULE:
+${taskContext.day || ""} at ${taskContext.time || ""}
+
+WINNING CONTENT:
+${taskContext.winnerInsights || "No winner history yet."}
+
+TASK:
+Write one caption draft in Rick's voice.
+Keep it natural, specific, non-corporate, non-salesy, and ready for light editing.
+`.trim();
+    }
 
     contentProjects.forEach((project) => {
       project.platforms.forEach((platform) => {
@@ -821,6 +914,22 @@ ${project.notes}
     setTasks((current) => [...generatedTasks, ...current]);
   }
 
+  function deleteProject(projectId) {
+  const confirmed = window.confirm(
+    "Delete this project and all associated tasks?"
+  );
+
+  if (!confirmed) return;
+
+  setContentProjects((current) =>
+    current.filter((project) => project.id !== projectId)
+  );
+
+  setTasks((current) =>
+    current.filter((task) => task.projectId !== projectId)
+  );
+}
+
   const allTrackedTasks = useMemo(() => {
     const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
     return [...tasks, ...archivedTasks];
@@ -874,6 +983,7 @@ ${project.notes}
         newProject={newProject}
         setNewProject={setNewProject}
         addContentProject={addContentProject}
+        deleteProject={deleteProject}
       />
 
       <section className="project-grid">
