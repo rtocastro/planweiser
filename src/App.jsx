@@ -8,7 +8,6 @@ import GeneratorModal from "./components/GeneratorModal";
 import AddMoveModal from "./components/AddMoveModal";
 import EditTaskModal from "./components/EditTaskModal";
 import ArchiveSection from "./components/ArchiveSection";
-import InsightsPanel from "./components/InsightsPanel";
 import TemplateLibrary from "./components/TemplateLibrary";
 import StyleProfile from "./components/StyleProfile";
 import ProjectManager from "./components/ProjectManager";
@@ -989,7 +988,6 @@ ${project.notes}
 
       <ArchiveSection archives={archives} />
 
-      <InsightsPanel tasks={tasks} />
       <WinningContentPanel tasks={tasks} />
 
       <GeneratorModal
