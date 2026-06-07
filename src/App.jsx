@@ -13,6 +13,9 @@ import StyleProfile from "./components/StyleProfile";
 import ProjectManager from "./components/ProjectManager";
 import WinningContentPanel from "./components/WinningContentPanel";
 
+// Service
+import { generateDraftFromPrompt } from "./services/aiService";
+
 
 const starterTasks = [];
 
@@ -88,6 +91,7 @@ function App() {
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [aiMode, setAiMode] = useState("local");
 
   const [selectedTemplate, setSelectedTemplate] = useState("lowEnergy");
 
@@ -680,7 +684,7 @@ Nothing fancy — just keeping momentum going.`;
     return nextDate.toISOString().split("T")[0];
   }
 
-  function generateCalendarFromProjects() {
+  async function generateCalendarFromProjects() {
     const dayMap = {
       Mon: "Monday",
       Tue: "Tuesday",
@@ -825,6 +829,7 @@ Keep it natural, specific, non-corporate, non-salesy, and ready for light editin
                   slot,
                   styleProfile,
                   generatorNotes,
+                  winnerInsights: getWinnerInsights(allTrackedTasks),
                 }),
 
                 note: `
@@ -887,6 +892,7 @@ ${project.notes}
                 slot: "",
                 styleProfile,
                 generatorNotes,
+                winnerInsights: getWinnerInsights(allTrackedTasks),
               }),
 
               note: `
@@ -911,24 +917,77 @@ ${project.notes}
       });
     });
 
-    setTasks((current) => [...generatedTasks, ...current]);
+    if (aiMode === "ai") {
+      const draftedTasks =
+        await generateAiDrafts(generatedTasks);
+
+      setTasks((current) => [
+        ...draftedTasks,
+        ...current,
+      ]);
+    } else {
+      setTasks((current) => [
+        ...generatedTasks,
+        ...current,
+      ]);
+    }
   }
 
   function deleteProject(projectId) {
-  const confirmed = window.confirm(
-    "Delete this project and all associated tasks?"
-  );
+    const confirmed = window.confirm(
+      "Delete this project and all associated tasks?"
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  setContentProjects((current) =>
-    current.filter((project) => project.id !== projectId)
-  );
+    setContentProjects((current) =>
+      current.filter((project) => project.id !== projectId)
+    );
 
-  setTasks((current) =>
-    current.filter((task) => task.projectId !== projectId)
-  );
-}
+    setTasks((current) =>
+      current.filter((task) => task.projectId !== projectId)
+    );
+  }
+
+  async function generateAiDrafts(tasksToProcess) {
+    const updatedTasks = [];
+
+    for (const task of tasksToProcess) {
+      const prompt = task.aiPrompt || buildPrompt(task);
+      const draft = await generateDraftFromPrompt(prompt);
+
+      updatedTasks.push({
+        ...task,
+        captionDraft: draft,
+      });
+    }
+
+    return updatedTasks;
+  }
+
+  function buildPrompt(task) {
+    return `
+GLOBAL STYLE:
+${styleProfile.tone}
+
+GOAL:
+${styleProfile.goal}
+
+TASK:
+${task.title}
+
+PLATFORM:
+${task.type}
+
+IDEA:
+${task.idea}
+
+NOTES:
+${task.note}
+
+Write a caption draft in Rick's voice.
+`;
+  }
 
   const allTrackedTasks = useMemo(() => {
     const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
@@ -1038,6 +1097,16 @@ ${project.notes}
               onClick={() => setIsGeneratorOpen(true)}
             >
               ⚡ Generate Week
+            </button>
+
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() =>
+                setAiMode((current) => (current === "local" ? "ai" : "local"))
+              }
+            >
+              {aiMode === "ai" ? "🤖 Mock AI On" : "🧠 Local Drafts"}
             </button>
 
             <button
