@@ -302,36 +302,36 @@ function App() {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
-function saveEditedTask(updatedTask) {
-  const shouldAutoSchedule =
-    updatedTask.finalCaption?.trim() && updatedTask.status === "Drafted";
+  function saveEditedTask(updatedTask) {
+    const shouldAutoSchedule =
+      updatedTask.finalCaption?.trim() && updatedTask.status === "Drafted";
 
-  const taskToSave = {
-    ...updatedTask,
-    status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
-  };
-
-  if (taskToSave.status === "Archived") {
-    const archive = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString(),
-      completed: taskToSave.done ? 1 : 0,
-      total: 1,
-      tasks: [taskToSave],
+    const taskToSave = {
+      ...updatedTask,
+      status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
     };
 
-    setArchives((current) => [archive, ...current]);
-    setTasks((current) => current.filter((task) => task.id !== taskToSave.id));
+    if (taskToSave.status === "Archived") {
+      const archive = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        completed: taskToSave.done ? 1 : 0,
+        total: 1,
+        tasks: [taskToSave],
+      };
+
+      setArchives((current) => [archive, ...current]);
+      setTasks((current) => current.filter((task) => task.id !== taskToSave.id));
+      setEditingTask(null);
+      return;
+    }
+
+    setTasks((current) =>
+      current.map((task) => (task.id === taskToSave.id ? taskToSave : task))
+    );
+
     setEditingTask(null);
-    return;
   }
-
-  setTasks((current) =>
-    current.map((task) => (task.id === taskToSave.id ? taskToSave : task))
-  );
-
-  setEditingTask(null);
-}
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -792,9 +792,9 @@ ${project.notes}
   }
 
   const allTrackedTasks = useMemo(() => {
-  const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
-  return [...tasks, ...archivedTasks];
-}, [tasks, archives]);
+    const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
+    return [...tasks, ...archivedTasks];
+  }, [tasks, archives]);
 
   return (
     <main className="app-shell">
@@ -941,7 +941,10 @@ ${project.notes}
               <TaskCard
                 key={task.id}
                 task={task}
-                project={project}
+                project={{
+                  ...project,
+                  emoji: getProjectEmoji(project?.name || ""),
+                }}
                 platformIcon={getPlatformIcon(task.type)}
                 onToggle={toggleTask}
                 onDelete={deleteTask}
@@ -960,7 +963,7 @@ ${project.notes}
 
       <ArchiveSection archives={archives} />
 
-<WinningContentPanel tasks={allTrackedTasks} />
+      <WinningContentPanel tasks={allTrackedTasks} />
 
       <GeneratorModal
         isOpen={isGeneratorOpen}
