@@ -302,21 +302,36 @@ function App() {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
-  function saveEditedTask(updatedTask) {
-    const shouldAutoSchedule =
-      updatedTask.finalCaption?.trim() && updatedTask.status === "Drafted";
+function saveEditedTask(updatedTask) {
+  const shouldAutoSchedule =
+    updatedTask.finalCaption?.trim() && updatedTask.status === "Drafted";
 
-    const taskToSave = {
-      ...updatedTask,
-      status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
+  const taskToSave = {
+    ...updatedTask,
+    status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
+  };
+
+  if (taskToSave.status === "Archived") {
+    const archive = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      completed: taskToSave.done ? 1 : 0,
+      total: 1,
+      tasks: [taskToSave],
     };
 
-    setTasks((current) =>
-      current.map((task) => (task.id === taskToSave.id ? taskToSave : task))
-    );
-
+    setArchives((current) => [archive, ...current]);
+    setTasks((current) => current.filter((task) => task.id !== taskToSave.id));
     setEditingTask(null);
+    return;
   }
+
+  setTasks((current) =>
+    current.map((task) => (task.id === taskToSave.id ? taskToSave : task))
+  );
+
+  setEditingTask(null);
+}
 
   function toggleTask(id) {
     setTasks((current) =>
