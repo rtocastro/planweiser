@@ -350,15 +350,24 @@ function App() {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
-  function saveEditedTask(updatedTask) {
-    setTasks((current) =>
-      current.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
+function saveEditedTask(updatedTask) {
+  const shouldAutoSchedule =
+    updatedTask.finalCaption?.trim() &&
+    updatedTask.status === "Drafted";
 
-    setEditingTask(null);
-  }
+  const taskToSave = {
+    ...updatedTask,
+    status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
+  };
+
+  setTasks((current) =>
+    current.map((task) =>
+      task.id === taskToSave.id ? taskToSave : task
+    )
+  );
+
+  setEditingTask(null);
+}
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -596,58 +605,58 @@ ${contextNote}
     return "Share a simple update that keeps momentum going.";
   }
 
-function getCaptionDraft(project, platform, slot = "") {
-  const purposes = platform.purposes || [];
-  const platformName = platform.platform;
-  const tone = project.tone || "";
-  const notes = project.notes || "";
+  function getCaptionDraft(project, platform, slot = "") {
+    const purposes = platform.purposes || [];
+    const platformName = platform.platform;
+    const tone = project.tone || "";
+    const notes = project.notes || "";
 
-  if (platformName === "Threads") {
-    if (purposes.includes("Engagement")) {
-      return "I told myself I'd stop starting new projects.\n\nAnyway here's project #47,873,839,007.";
+    if (platformName === "Threads") {
+      if (purposes.includes("Engagement")) {
+        return "I told myself I'd stop starting new projects.\n\nAnyway here's project #47,873,839,007.";
+      }
+
+      if (purposes.includes("Community")) {
+        return "What’s something you’re working on right now that started as “just a quick idea” and became a whole thing?";
+      }
+
+      if (purposes.includes("Brand Building")) {
+        return `Slowly building ${project.name} one tiny chaotic decision at a time.`;
+      }
+
+      return "Small update: still building, still learning, still somehow adding more to the list.";
     }
 
-    if (purposes.includes("Community")) {
-      return "What’s something you’re working on right now that started as “just a quick idea” and became a whole thing?";
+    if (platformName === "Instagram") {
+      if (purposes.includes("Sales")) {
+        return "Made this one for the people who get it.\n\nLight nudge: it’s up now if you want to check it out.";
+      }
+
+      if (purposes.includes("Brand Building")) {
+        return `A little behind-the-scenes look at what I’m building with ${project.name}.`;
+      }
+
+      if (purposes.includes("Engagement")) {
+        return "Quick question: which one would you pick?";
+      }
+
+      return "A quick snapshot from the week.";
     }
 
-    if (purposes.includes("Brand Building")) {
-      return `Slowly building ${project.name} one tiny chaotic decision at a time.`;
+    if (platformName === "YouTube") {
+      return `New video idea for ${project.name}: a quick look behind the scenes and what went into making this.`;
     }
 
-    return "Small update: still building, still learning, still somehow adding more to the list.";
+    if (platformName === "TikTok") {
+      return "Quick little behind-the-scenes moment because apparently everything is content now.";
+    }
+
+    if (platformName === "Facebook") {
+      return `Sharing a quick update from ${project.name}. More soon.`;
+    }
+
+    return "Small progress update. Nothing fancy, just keeping the momentum going.";
   }
-
-  if (platformName === "Instagram") {
-    if (purposes.includes("Sales")) {
-      return "Made this one for the people who get it.\n\nLight nudge: it’s up now if you want to check it out.";
-    }
-
-    if (purposes.includes("Brand Building")) {
-      return `A little behind-the-scenes look at what I’m building with ${project.name}.`;
-    }
-
-    if (purposes.includes("Engagement")) {
-      return "Quick question: which one would you pick?";
-    }
-
-    return "A quick snapshot from the week.";
-  }
-
-  if (platformName === "YouTube") {
-    return `New video idea for ${project.name}: a quick look behind the scenes and what went into making this.`;
-  }
-
-  if (platformName === "TikTok") {
-    return "Quick little behind-the-scenes moment because apparently everything is content now.";
-  }
-
-  if (platformName === "Facebook") {
-    return `Sharing a quick update from ${project.name}. More soon.`;
-  }
-
-  return "Small progress update. Nothing fancy, just keeping the momentum going.";
-}
 
   function generateCalendarFromProjects() {
     const dayMap = {
@@ -665,6 +674,33 @@ function getCaptionDraft(project, platform, slot = "") {
       Afternoon: "12:30 PM",
       Night: "7:17 PM",
     };
+
+    function getNextDateForDay(dayShort) {
+      const dayIndexMap = {
+        Sun: 0,
+        Mon: 1,
+        Tue: 2,
+        Wed: 3,
+        Thu: 4,
+        Fri: 5,
+        Sat: 6,
+      };
+
+      const today = new Date();
+      const targetDay = dayIndexMap[dayShort];
+      const currentDay = today.getDay();
+
+      let daysUntil = targetDay - currentDay;
+
+      if (daysUntil < 0) {
+        daysUntil += 7;
+      }
+
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + daysUntil);
+
+      return nextDate.toISOString().split("T")[0];
+    }
 
     const generatedTasks = [];
 
@@ -696,7 +732,7 @@ function getCaptionDraft(project, platform, slot = "") {
 
                 type: platform.platform,
 
-                suggestedDate: new Date().toISOString().split("T")[0],
+                suggestedDate: getNextDateForDay(day),
 
                 generatorContext: {
                   project: project.name,
@@ -746,6 +782,8 @@ ${project.notes}
               title: `${platform.platform} Content`,
 
               type: platform.platform,
+
+              suggestedDate: getNextDateForDay(day),
 
               note: `
 Purpose:
