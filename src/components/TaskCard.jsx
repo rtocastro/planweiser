@@ -14,14 +14,18 @@ const statusEmoji = {
   Archived: "📦",
 };
 
-
-function TaskCard({ task, project, platformIcon, onToggle, onDelete, onEdit }) {
+function TaskCard({
+  task,
+  project,
+  platformIcon,
+  onToggle,
+  onDelete,
+  onEdit,
+}) {
   const status = task.status || (task.done ? "Posted" : "Drafted");
-
 
   function copyFinalCaption() {
     if (!task.finalCaption) return;
-
     navigator.clipboard.writeText(task.finalCaption);
   }
 
@@ -79,36 +83,17 @@ function TaskCard({ task, project, platformIcon, onToggle, onDelete, onEdit }) {
               (value) => value !== "" && value !== 0
             ) && (
               <div className="metrics-summary">
-                {task.metrics.views && (
-                  <span>👀 {task.metrics.views}</span>
-                )}
-
-                {task.metrics.likes && (
-                  <span>❤️ {task.metrics.likes}</span>
-                )}
-
+                {task.metrics.views && <span>👀 {task.metrics.views}</span>}
+                {task.metrics.likes && <span>❤️ {task.metrics.likes}</span>}
                 {task.metrics.comments && (
                   <span>💬 {task.metrics.comments}</span>
                 )}
-
-                {task.metrics.shares && (
-                  <span>🔁 {task.metrics.shares}</span>
-                )}
-
-                {task.metrics.saves && (
-                  <span>🔖 {task.metrics.saves}</span>
-                )}
-
-                {task.metrics.clicks && (
-                  <span>🖱️ {task.metrics.clicks}</span>
-                )}
-
-                {task.metrics.orders && (
-                  <span>🛒 {task.metrics.orders}</span>
-                )}
+                {task.metrics.shares && <span>🔁 {task.metrics.shares}</span>}
+                {task.metrics.saves && <span>🔖 {task.metrics.saves}</span>}
+                {task.metrics.clicks && <span>🖱️ {task.metrics.clicks}</span>}
+                {task.metrics.orders && <span>🛒 {task.metrics.orders}</span>}
               </div>
             )}
-
 
           <p>{task.note}</p>
         </div>
@@ -116,7 +101,6 @@ function TaskCard({ task, project, platformIcon, onToggle, onDelete, onEdit }) {
 
       <div className="task-actions">
         <button onClick={() => onEdit(task)}>Edit</button>
-
 
         <button onClick={() => onToggle(task.id)}>
           {task.done ? "Done" : "Mark Done"}

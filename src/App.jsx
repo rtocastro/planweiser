@@ -81,7 +81,7 @@ const starterTasks = [
 ];
 
 const emptyMove = {
-  projectId: "geek",
+  projectId: "",
   day: "Monday",
   time: "",
   title: "",
@@ -170,11 +170,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-          tone: "funny, quirky, witty, light motivation, slightly unhinged",
-          mustInclude: "Geek-E Garments, TZA, personal creativity",
-          avoid: "salesy, cryptic, burnout vibes, overexplaining",
-          goal: "consistency and growth",
-        };
+        tone: "funny, quirky, witty, light motivation, slightly unhinged",
+        mustInclude: "Geek-E Garments, TZA, personal creativity",
+        avoid: "salesy, cryptic, burnout vibes, overexplaining",
+        goal: "consistency and growth",
+      };
   });
 
   const [generatorNotes, setGeneratorNotes] = useState(() => {
@@ -183,11 +183,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-          customDirection:
-            "funny, quirky, witty, light motivation, slightly unhinged",
-          mustInclude: "Geek-E Garments, TZA, personal creativity",
-          avoid: "salesy, cryptic, burnout vibes, overexplaining",
-        };
+        customDirection:
+          "funny, quirky, witty, light motivation, slightly unhinged",
+        mustInclude: "Geek-E Garments, TZA, personal creativity",
+        avoid: "salesy, cryptic, burnout vibes, overexplaining",
+      };
   });
 
   const [tasks, setTasks] = useState(() => {
@@ -211,37 +211,37 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : [
-          {
-            id: Date.now(),
-            name: "Thee Zombie Apocalypse",
-            tone: "funny, heavy, witty, direct",
-            notes: "Promote songs and build audience.",
-            platforms: [
-              {
-                id: 1,
-                platform: "Instagram",
-                cadence: "weekly",
-                frequency: 3,
-                postsPerDay: 1,
-                timeSlots: [],
-                days: [],
-                purposes: [],
-                contentType: "Post",
-              },
-              {
-                id: 2,
-                platform: "Threads",
-                cadence: "weekly",
-                frequency: 7,
-                postsPerDay: 1,
-                timeSlots: [],
-                days: [],
-                purposes: [],
-                contentType: "Post",
-              },
-            ],
-          },
-        ];
+        {
+          id: Date.now(),
+          name: "Thee Zombie Apocalypse",
+          tone: "funny, heavy, witty, direct",
+          notes: "Promote songs and build audience.",
+          platforms: [
+            {
+              id: 1,
+              platform: "Instagram",
+              cadence: "weekly",
+              frequency: 3,
+              postsPerDay: 1,
+              timeSlots: [],
+              days: [],
+              purposes: [],
+              contentType: "Post",
+            },
+            {
+              id: 2,
+              platform: "Threads",
+              cadence: "weekly",
+              frequency: 7,
+              postsPerDay: 1,
+              timeSlots: [],
+              days: [],
+              purposes: [],
+              contentType: "Post",
+            },
+          ],
+        },
+      ];
   });
 
   const [newProject, setNewProject] = useState({
@@ -448,6 +448,7 @@ function App() {
       {
         id: Date.now(),
         ...newMove,
+        projectId: newMove.projectId || contentProjects[0]?.id || "",
         time: newMove.time || "Flexible",
         status: "Drafted",
         done: false,
@@ -894,9 +895,8 @@ ${project.notes}
         {contentProjects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${
-              activeProject === project.id ? "active" : ""
-            }`}
+            className={`project-card ${activeProject === project.id ? "active" : ""
+              }`}
             onClick={() => setActiveProject(project.id)}
           >
             <span>{getProjectEmoji(project.name)}</span>
@@ -912,9 +912,8 @@ ${project.notes}
         {availablePlatforms.map((platform) => (
           <button
             key={platform}
-            className={`platform-filter-button ${
-              activePlatform === platform ? "active" : ""
-            }`}
+            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
+              }`}
             onClick={() => setActivePlatform(platform)}
           >
             {platform === "all" ? "All Platforms" : platform}
@@ -1023,7 +1022,7 @@ ${project.notes}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         newMove={newMove}
-        projects={projects}
+        projects={contentProjects}
         handleChange={handleChange}
         addMove={addMove}
       />
