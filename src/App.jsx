@@ -13,72 +13,8 @@ import StyleProfile from "./components/StyleProfile";
 import ProjectManager from "./components/ProjectManager";
 import WinningContentPanel from "./components/WinningContentPanel";
 
-const projects = [
-  {
-    id: "geek",
-    name: "Geek-E-Garments",
-    emoji: "🐾",
-    vibe: "Non-pushy product visibility",
-    color: "green",
-  },
-  {
-    id: "tza",
-    name: "Thee Zombie Apocalypse",
-    emoji: "🧟",
-    vibe: "Release hype + music momentum",
-    color: "jade",
-  },
-  {
-    id: "personal",
-    name: "Personal Brand",
-    emoji: "✨",
-    vibe: "Funny, relatable, creative presence",
-    color: "purple",
-  },
-];
 
-const starterTasks = [
-  {
-    id: 1,
-    projectId: "geek",
-    day: "Monday",
-    time: "9:15 AM",
-    title: "Post one product-focused IG caption",
-    type: "Instagram",
-    note: "Keep it light, clever, and non-salesy.",
-    done: false,
-  },
-  {
-    id: 2,
-    projectId: "tza",
-    day: "Tuesday",
-    time: "7:17 PM",
-    title: "Drop one riff/meme teaser",
-    type: "Threads",
-    note: "Funny, heavy, direct, not too cryptic.",
-    done: false,
-  },
-  {
-    id: 3,
-    projectId: "personal",
-    day: "Wednesday",
-    time: "12:30 PM",
-    title: "Post a personal creative thought",
-    type: "Threads",
-    note: "Make it witty but still grounded.",
-    done: false,
-  },
-  {
-    id: 4,
-    projectId: "geek",
-    day: "Friday",
-    time: "6:45 PM",
-    title: "Review Etsy winner products",
-    type: "Task",
-    note: "Look for products worth repeating next week.",
-    done: false,
-  },
-];
+const starterTasks = [];
 
 const emptyMove = {
   projectId: "",
@@ -882,6 +818,14 @@ ${project.notes}
         </div>
       </section>
 
+            <ProjectManager
+        contentProjects={contentProjects}
+        setContentProjects={setContentProjects}
+        newProject={newProject}
+        setNewProject={setNewProject}
+        addContentProject={addContentProject}
+      />
+
       <section className="project-grid">
         <button
           className={`project-card ${activeProject === "all" ? "active" : ""}`}
@@ -987,14 +931,6 @@ ${project.notes}
           })}
         </div>
       </section>
-
-      <ProjectManager
-        contentProjects={contentProjects}
-        setContentProjects={setContentProjects}
-        newProject={newProject}
-        setNewProject={setNewProject}
-        addContentProject={addContentProject}
-      />
 
       <TemplateLibrary
         customTemplates={customTemplates}
