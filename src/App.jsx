@@ -89,8 +89,6 @@ const emptyMove = {
   note: "",
 };
 
-
-
 function getProjectEmoji(name = "") {
   const lower = name.toLowerCase();
 
@@ -149,11 +147,11 @@ function getPlatformIcon(platform = "") {
 
 function App() {
   const [activeProject, setActiveProject] = useState("all");
+  const [activePlatform, setActivePlatform] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMove, setNewMove] = useState(emptyMove);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [activePlatform, setActivePlatform] = useState("all");
 
   const [selectedTemplate, setSelectedTemplate] = useState("lowEnergy");
 
@@ -172,12 +170,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        tone:
-          "funny, quirky, witty, light motivation, slightly unhinged",
-        mustInclude: "Geek-E Garments, TZA, personal creativity",
-        avoid: "salesy, cryptic, burnout vibes, overexplaining",
-        goal: "consistency and growth",
-      };
+          tone: "funny, quirky, witty, light motivation, slightly unhinged",
+          mustInclude: "Geek-E Garments, TZA, personal creativity",
+          avoid: "salesy, cryptic, burnout vibes, overexplaining",
+          goal: "consistency and growth",
+        };
   });
 
   const [generatorNotes, setGeneratorNotes] = useState(() => {
@@ -186,11 +183,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        customDirection:
-          "funny, quirky, witty, light motivation, slightly unhinged",
-        mustInclude: "Geek-E Garments, TZA, personal creativity",
-        avoid: "salesy, cryptic, burnout vibes, overexplaining",
-      };
+          customDirection:
+            "funny, quirky, witty, light motivation, slightly unhinged",
+          mustInclude: "Geek-E Garments, TZA, personal creativity",
+          avoid: "salesy, cryptic, burnout vibes, overexplaining",
+        };
   });
 
   const [tasks, setTasks] = useState(() => {
@@ -214,25 +211,37 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : [
-        {
-          id: Date.now(),
-          name: "Thee Zombie Apocalypse",
-          tone: "funny, heavy, witty, direct",
-          notes: "Promote songs and build audience.",
-          platforms: [
-            {
-              id: 1,
-              platform: "Instagram",
-              frequency: 3,
-            },
-            {
-              id: 2,
-              platform: "Threads",
-              frequency: 7,
-            },
-          ],
-        },
-      ];
+          {
+            id: Date.now(),
+            name: "Thee Zombie Apocalypse",
+            tone: "funny, heavy, witty, direct",
+            notes: "Promote songs and build audience.",
+            platforms: [
+              {
+                id: 1,
+                platform: "Instagram",
+                cadence: "weekly",
+                frequency: 3,
+                postsPerDay: 1,
+                timeSlots: [],
+                days: [],
+                purposes: [],
+                contentType: "Post",
+              },
+              {
+                id: 2,
+                platform: "Threads",
+                cadence: "weekly",
+                frequency: 7,
+                postsPerDay: 1,
+                timeSlots: [],
+                days: [],
+                purposes: [],
+                contentType: "Post",
+              },
+            ],
+          },
+        ];
   });
 
   const [newProject, setNewProject] = useState({
@@ -280,7 +289,6 @@ function App() {
         return total + 5;
     }
   }, 0);
-
 
   useEffect(() => {
     localStorage.setItem("planweiser-tasks", JSON.stringify(tasks));
@@ -332,18 +340,14 @@ function App() {
 
     setTasks((current) =>
       current.map((task) => {
-        if (
-          task.status !== "Posted" ||
-          !task.postedDate
-        ) {
+        if (task.status !== "Posted" || !task.postedDate) {
           return task;
         }
 
         const postedDate = new Date(task.postedDate);
 
         const diffDays = Math.floor(
-          (today - postedDate) /
-          (1000 * 60 * 60 * 24)
+          (today - postedDate) / (1000 * 60 * 60 * 24)
         );
 
         if (diffDays >= 7) {
@@ -358,16 +362,13 @@ function App() {
     );
   }, []);
 
-
-
   function deleteTask(id) {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
   function saveEditedTask(updatedTask) {
     const shouldAutoSchedule =
-      updatedTask.finalCaption?.trim() &&
-      updatedTask.status === "Drafted";
+      updatedTask.finalCaption?.trim() && updatedTask.status === "Drafted";
 
     const taskToSave = {
       ...updatedTask,
@@ -375,9 +376,7 @@ function App() {
     };
 
     setTasks((current) =>
-      current.map((task) =>
-        task.id === taskToSave.id ? taskToSave : task
-      )
+      current.map((task) => (task.id === taskToSave.id ? taskToSave : task))
     );
 
     setEditingTask(null);
@@ -404,6 +403,14 @@ function App() {
         title: task.title,
         type: task.type,
         note: task.note,
+        idea: task.idea,
+        captionDraft: task.captionDraft,
+        finalCaption: task.finalCaption,
+        status: task.status,
+        suggestedDate: task.suggestedDate,
+        postedDate: task.postedDate,
+        metrics: task.metrics,
+        generatorContext: task.generatorContext,
       })),
     };
 
@@ -442,6 +449,7 @@ function App() {
         id: Date.now(),
         ...newMove,
         time: newMove.time || "Flexible",
+        status: "Drafted",
         done: false,
       },
       ...current,
@@ -469,6 +477,7 @@ function App() {
           generatorSettings.tone === "funny"
             ? "Keep it witty and subtle."
             : "Focus on product visibility.",
+        status: "Drafted",
         done: false,
       });
     }
@@ -488,6 +497,7 @@ function App() {
           generatorSettings.goal === "release"
             ? "Push anticipation for upcoming release."
             : "Maintain audience momentum.",
+        status: "Drafted",
         done: false,
       });
     }
@@ -507,6 +517,7 @@ function App() {
           generatorSettings.energy === "low"
             ? "Low-effort relatable post."
             : "Higher-energy engaging post.",
+        status: "Drafted",
         done: false,
       });
     }
@@ -543,6 +554,7 @@ ${task.note}
 
 ${contextNote}
 `.trim(),
+      status: "Drafted",
       done: false,
     }));
 
@@ -577,8 +589,6 @@ ${contextNote}
       notes: newProject.notes,
       platforms: [],
     };
-
-
 
     setContentProjects((current) => [project, ...current]);
 
@@ -619,11 +629,9 @@ ${contextNote}
     return "Share a simple update that keeps momentum going.";
   }
 
-  function getCaptionDraft(project, platform, slot = "") {
+  function getCaptionDraft(project, platform) {
     const purposes = platform.purposes || [];
     const platformName = platform.platform;
-    const tone = project.tone || "";
-    const notes = project.notes || "";
 
     if (platformName === "Threads") {
       if (purposes.includes("Engagement")) {
@@ -672,6 +680,33 @@ ${contextNote}
     return "Small progress update. Nothing fancy, just keeping the momentum going.";
   }
 
+  function getNextDateForDay(dayShort) {
+    const dayIndexMap = {
+      Sun: 0,
+      Mon: 1,
+      Tue: 2,
+      Wed: 3,
+      Thu: 4,
+      Fri: 5,
+      Sat: 6,
+    };
+
+    const today = new Date();
+    const targetDay = dayIndexMap[dayShort];
+    const currentDay = today.getDay();
+
+    let daysUntil = targetDay - currentDay;
+
+    if (daysUntil < 0) {
+      daysUntil += 7;
+    }
+
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + daysUntil);
+
+    return nextDate.toISOString().split("T")[0];
+  }
+
   function generateCalendarFromProjects() {
     const dayMap = {
       Mon: "Monday",
@@ -688,33 +723,6 @@ ${contextNote}
       Afternoon: "12:30 PM",
       Night: "7:17 PM",
     };
-
-    function getNextDateForDay(dayShort) {
-      const dayIndexMap = {
-        Sun: 0,
-        Mon: 1,
-        Tue: 2,
-        Wed: 3,
-        Thu: 4,
-        Fri: 5,
-        Sat: 6,
-      };
-
-      const today = new Date();
-      const targetDay = dayIndexMap[dayShort];
-      const currentDay = today.getDay();
-
-      let daysUntil = targetDay - currentDay;
-
-      if (daysUntil < 0) {
-        daysUntil += 7;
-      }
-
-      const nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + daysUntil);
-
-      return nextDate.toISOString().split("T")[0];
-    }
 
     const generatedTasks = [];
 
@@ -733,31 +741,33 @@ ${contextNote}
 
           selectedDays.forEach((day) => {
             slots.forEach((slot) => {
+              const suggestedTime = slotTimes[slot] || "Flexible";
+
               generatedTasks.push({
                 id: Date.now() + generatedTasks.length,
-
                 projectId: project.id,
-
                 day: dayMap[day],
-
-                time: slotTimes[slot] || "Flexible",
-
+                time: suggestedTime,
                 title: `${platform.platform} • ${slot}`,
-
                 type: platform.platform,
-
                 suggestedDate: getNextDateForDay(day),
 
                 generatorContext: {
-                  project: project.name,
-                  tone: project.tone,
+                  projectName: project.name,
+                  projectTone: project.tone,
+                  projectNotes: project.notes,
                   platform: platform.platform,
+                  contentType: platform.contentType,
                   purposes: platform.purposes || [],
-                  notes: project.notes,
+                  cadence: platform.cadence,
+                  day: dayMap[day],
+                  time: suggestedTime,
+                  slot,
+                  styleProfile,
+                  generatorNotes,
                 },
 
                 note: `
-                
 Purpose:
 ${(platform.purposes || []).join(", ")}
 
@@ -772,32 +782,37 @@ ${project.notes}
                 captionDraft: getCaptionDraft(project, platform, slot),
                 finalCaption: "",
                 status: "Drafted",
-
                 done: false,
               });
             });
           });
         } else {
-          const weeklyDays = selectedDays.slice(
-            0,
-            platform.frequency || 1
-          );
+          const weeklyDays = selectedDays.slice(0, platform.frequency || 1);
 
           weeklyDays.forEach((day) => {
             generatedTasks.push({
               id: Date.now() + generatedTasks.length,
-
               projectId: project.id,
-
               day: dayMap[day],
-
               time: "Flexible",
-
               title: `${platform.platform} Content`,
-
               type: platform.platform,
-
               suggestedDate: getNextDateForDay(day),
+
+              generatorContext: {
+                projectName: project.name,
+                projectTone: project.tone,
+                projectNotes: project.notes,
+                platform: platform.platform,
+                contentType: platform.contentType,
+                purposes: platform.purposes || [],
+                cadence: platform.cadence,
+                day: dayMap[day],
+                time: "Flexible",
+                slot: "",
+                styleProfile,
+                generatorNotes,
+              },
 
               note: `
 Purpose:
@@ -814,7 +829,6 @@ ${project.notes}
               captionDraft: getCaptionDraft(project, platform),
               finalCaption: "",
               status: "Drafted",
-
               done: false,
             });
           });
@@ -822,13 +836,8 @@ ${project.notes}
       });
     });
 
-    setTasks((current) => [
-      ...generatedTasks,
-      ...current,
-    ]);
+    setTasks((current) => [...generatedTasks, ...current]);
   }
-
-
 
   return (
     <main className="app-shell">
@@ -885,23 +894,16 @@ ${project.notes}
         {contentProjects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${activeProject === project.id
-              ? "active"
-              : ""
-              }`}
-            onClick={() =>
-              setActiveProject(project.id)
-            }
+            className={`project-card ${
+              activeProject === project.id ? "active" : ""
+            }`}
+            onClick={() => setActiveProject(project.id)}
           >
             <span>{getProjectEmoji(project.name)}</span>
 
             <h3>{project.name}</h3>
 
-            <p>
-              {project.platforms?.length || 0}
-              {" "}
-              platforms
-            </p>
+            <p>{project.platforms?.length || 0} platforms</p>
           </button>
         ))}
       </section>
@@ -910,8 +912,9 @@ ${project.notes}
         {availablePlatforms.map((platform) => (
           <button
             key={platform}
-            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
-              }`}
+            className={`platform-filter-button ${
+              activePlatform === platform ? "active" : ""
+            }`}
             onClick={() => setActivePlatform(platform)}
           >
             {platform === "all" ? "All Platforms" : platform}
@@ -967,11 +970,9 @@ ${project.notes}
 
         <div className="task-list">
           {filteredTasks.map((task) => {
-            const project =
-              contentProjects.find(
-                (item) =>
-                  item.id === task.projectId
-              );
+            const project = contentProjects.find(
+              (item) => item.id === task.projectId
+            );
 
             return (
               <TaskCard
