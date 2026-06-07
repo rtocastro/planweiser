@@ -47,10 +47,29 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
             </p>
           )}
 
-          {task.captionDraft && (
-            <p>
-              <strong>Caption Draft:</strong> {task.captionDraft}
-            </p>
+          {task.finalCaption ? (
+            <div className="caption-box">
+              <div className="caption-header">
+                <strong>Final Caption:</strong>
+
+                <button
+                  type="button"
+                  className="copy-button"
+                  onClick={copyFinalCaption}
+                  title="Copy final caption"
+                >
+                  ⧉
+                </button>
+              </div>
+
+              <p>{task.finalCaption}</p>
+            </div>
+          ) : (
+            task.captionDraft && (
+              <p>
+                <strong>Caption Draft:</strong> {task.captionDraft}
+              </p>
+            )
           )}
 
           {task.metrics &&
