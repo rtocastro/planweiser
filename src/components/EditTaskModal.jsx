@@ -104,6 +104,17 @@ function EditTaskModal({
         </label>
 
         <label>
+          Winner Tags
+          <input
+            value={editingTask.winnerTags || ""}
+            onChange={(e) =>
+              updateEditingTask("winnerTags", e.target.value)
+            }
+            placeholder="funny, vegan, question, cat, meme, BTS"
+          />
+        </label>
+
+        <label>
           Status
           <select
             value={editingTask.status || "Drafted"}

@@ -78,6 +78,12 @@ function TaskCard({
             )
           )}
 
+          {task.winnerTags && (
+            <p>
+              <strong>Tags:</strong> {task.winnerTags}
+            </p>
+          )}
+
           {task.metrics &&
             Object.values(task.metrics).some(
               (value) => value !== "" && value !== 0

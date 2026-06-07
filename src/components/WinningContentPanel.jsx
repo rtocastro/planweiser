@@ -11,6 +11,40 @@ function getWinnerScore(task) {
     );
 }
 
+function getBestTags(tasks) {
+    const tagScores = {};
+
+    tasks.forEach((task) => {
+        if (!task.winnerTags) return;
+
+        const tags = task.winnerTags
+            .split(",")
+            .map((tag) => tag.trim().toLowerCase())
+            .filter(Boolean);
+
+        tags.forEach((tag) => {
+            if (!tagScores[tag]) {
+                tagScores[tag] = {
+                    label: tag,
+                    total: 0,
+                    count: 0,
+                };
+            }
+
+            tagScores[tag].total += getWinnerScore(task);
+            tagScores[tag].count += 1;
+        });
+    });
+
+    return Object.values(tagScores)
+        .map((tag) => ({
+            ...tag,
+            average: Math.round(tag.total / tag.count),
+        }))
+        .sort((a, b) => b.average - a.average)
+        .slice(0, 5);
+}
+
 function getBestByGroup(tasks, groupKey) {
     const groups = {};
 
@@ -69,45 +103,25 @@ function WinningContentPanel({ tasks }) {
         return match?.[1]?.trim() || "General";
     });
 
+    const bestTags = getBestTags(postsWithMetrics);
+
     return (
         <section className="archive-section">
             <p className="eyebrow">Insights</p>
             <h2>🏆 Winning Content</h2>
+<div className="winner-card">
+  <h3>🏷️ Best Tags</h3>
 
-            <div className="winner-grid">
-                {topPosts.map((post, index) => (
-                    <div className="winner-card" key={post.id}>
-                        <h3>#{index + 1} Winner</h3>
-                        <strong>{post.title}</strong>
-                        <p>{post.type}</p>
-                        <p>Winner Score: {getWinnerScore(post)}</p>
-
-                        {(post.finalCaption || post.captionDraft) && (
-                            <p>
-                                <strong>Caption:</strong> {post.finalCaption || post.captionDraft}
-                            </p>
-                        )}
-                    </div>
-                ))}
-
-                <div className="winner-card">
-                    <h3>📱 Best Platform</h3>
-                    <strong>{bestPlatform?.label}</strong>
-                    <p>Avg Score: {bestPlatform?.average}</p>
-                </div>
-
-                <div className="winner-card">
-                    <h3>🕒 Best Time Slot</h3>
-                    <strong>{bestTimeSlot?.label}</strong>
-                    <p>Avg Score: {bestTimeSlot?.average}</p>
-                </div>
-
-                <div className="winner-card">
-                    <h3>🎯 Best Purpose</h3>
-                    <strong>{bestPurpose?.label}</strong>
-                    <p>Avg Score: {bestPurpose?.average}</p>
-                </div>
-            </div>
+  {bestTags.length ? (
+    bestTags.map((tag) => (
+      <p key={tag.label}>
+        <strong>{tag.label}</strong> · Avg Score: {tag.average}
+      </p>
+    ))
+  ) : (
+    <p>No tags yet.</p>
+  )}
+</div>
         </section>
     );
 }
