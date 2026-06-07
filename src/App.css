@@ -678,6 +678,96 @@ h1 {
   cursor: pointer;
 }
 
+
+:root {
+  --red: #d1092f;
+  --cream: #f4f4f2;
+  --navy: #142f52;
+  --gray: #b2b5b2;
+  --black: #050505;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(209, 9, 47, 0.22), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(20, 47, 82, 0.45), transparent 38%),
+    linear-gradient(135deg, #050505, #10151c 55%, #142f52);
+  color: var(--cream);
+}
+
+.eyebrow,
+.task-meta {
+  color: var(--red);
+}
+
+.progress-card,
+.project-card,
+.task-card,
+.archive-card,
+.winner-card {
+  background: rgba(20, 47, 82, 0.38);
+  border-color: rgba(244, 244, 242, 0.14);
+}
+
+.project-card:hover,
+.project-card.active {
+  border-color: rgba(209, 9, 47, 0.8);
+  background: rgba(209, 9, 47, 0.14);
+}
+
+.ghost-button,
+.submit-button,
+.task-card button {
+  background: var(--cream);
+  color: var(--black);
+}
+
+.task-card button:first-child,
+.platform-filter-button.active,
+.progress-track div {
+  background: linear-gradient(90deg, var(--red), #ff4b68);
+  color: var(--cream);
+}
+
+.move-modal {
+  background: #07111f;
+  border-color: rgba(209, 9, 47, 0.35);
+}
+
+.move-modal input,
+.move-modal select,
+.move-modal textarea,
+.mini-form input,
+.mini-form textarea,
+.platform-row input,
+.platform-row select,
+.profile-grid textarea,
+.profile-grid input,
+.template-input {
+  background: rgba(244, 244, 242, 0.08);
+  border-color: rgba(178, 181, 178, 0.25);
+  color: var(--cream);
+}
+
+.status-posted,
+.metrics-summary span {
+  color: var(--cream);
+}
+
+.metrics-summary span {
+  background: rgba(209, 9, 47, 0.18);
+}
+
+.caption-box {
+  background: rgba(5, 5, 5, 0.28);
+  border-color: rgba(244, 244, 242, 0.16);
+}
+
+.copy-button {
+  background: rgba(209, 9, 47, 0.22) !important;
+  color: var(--cream) !important;
+}
+
 @media (max-width: 650px) {
   .metrics-grid {
     grid-template-columns: 1fr;
