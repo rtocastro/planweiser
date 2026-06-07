@@ -791,6 +791,11 @@ ${project.notes}
     setTasks((current) => [...generatedTasks, ...current]);
   }
 
+  const allTrackedTasks = useMemo(() => {
+  const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
+  return [...tasks, ...archivedTasks];
+}, [tasks, archives]);
+
   return (
     <main className="app-shell">
       <section className="hero">
@@ -955,7 +960,7 @@ ${project.notes}
 
       <ArchiveSection archives={archives} />
 
-      <WinningContentPanel tasks={tasks} />
+<WinningContentPanel tasks={allTrackedTasks} />
 
       <GeneratorModal
         isOpen={isGeneratorOpen}
