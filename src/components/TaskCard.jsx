@@ -15,7 +15,7 @@ const statusEmoji = {
 };
 
 
-function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
+function TaskCard({ task, project, platformIcon, onToggle, onDelete, onEdit }) {
   const status = task.status || (task.done ? "Posted" : "Drafted");
 
 
@@ -28,7 +28,9 @@ function TaskCard({ task, project, onToggle, onDelete, onEdit }) {
   return (
     <article className={`task-card ${task.done ? "done" : ""}`}>
       <div className="task-main">
-        <div className="task-badge">{project?.emoji || "📁"}</div>
+        <div className="task-badge">
+          {project?.emoji || "📁"} {platformIcon || "📡"}
+        </div>
 
         <div>
           <div className={`status-pill ${statusStyles[status] || ""}`}>

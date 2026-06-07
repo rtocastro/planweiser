@@ -132,6 +132,21 @@ function getProjectEmoji(name = "") {
   return "📁";
 }
 
+function getPlatformIcon(platform = "") {
+  const lower = platform.toLowerCase();
+
+  if (lower.includes("instagram")) return "📸";
+  if (lower.includes("threads")) return "🧵";
+  if (lower.includes("tiktok")) return "🎵";
+  if (lower.includes("youtube")) return "▶️";
+  if (lower.includes("facebook")) return "📘";
+  if (lower.includes("twitter") || lower.includes("x /")) return "✖️";
+  if (lower.includes("linkedin")) return "💼";
+  if (lower.includes("blog")) return "✍️";
+
+  return "📡";
+}
+
 function App() {
   const [activeProject, setActiveProject] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -349,24 +364,24 @@ function App() {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
-function saveEditedTask(updatedTask) {
-  const shouldAutoSchedule =
-    updatedTask.finalCaption?.trim() &&
-    updatedTask.status === "Drafted";
+  function saveEditedTask(updatedTask) {
+    const shouldAutoSchedule =
+      updatedTask.finalCaption?.trim() &&
+      updatedTask.status === "Drafted";
 
-  const taskToSave = {
-    ...updatedTask,
-    status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
-  };
+    const taskToSave = {
+      ...updatedTask,
+      status: shouldAutoSchedule ? "Scheduled" : updatedTask.status,
+    };
 
-  setTasks((current) =>
-    current.map((task) =>
-      task.id === taskToSave.id ? taskToSave : task
-    )
-  );
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === taskToSave.id ? taskToSave : task
+      )
+    );
 
-  setEditingTask(null);
-}
+    setEditingTask(null);
+  }
 
   function toggleTask(id) {
     setTasks((current) =>
@@ -963,6 +978,7 @@ ${project.notes}
                 key={task.id}
                 task={task}
                 project={project}
+                platformIcon={getPlatformIcon(task.type)}
                 onToggle={toggleTask}
                 onDelete={deleteTask}
                 onEdit={setEditingTask}
