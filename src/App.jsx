@@ -719,6 +719,21 @@ ${contextNote}
                   generatorNotes,
                 },
 
+                aiPrompt: buildAIPrompt({
+                  projectName: project.name,
+                  projectTone: project.tone,
+                  projectNotes: project.notes,
+                  platform: platform.platform,
+                  contentType: platform.contentType,
+                  purposes: platform.purposes || [],
+                  cadence: platform.cadence,
+                  day: dayMap[day],
+                  time: suggestedTime,
+                  slot,
+                  styleProfile,
+                  generatorNotes,
+                }),
+
                 note: `
 Purpose:
 ${(platform.purposes || []).join(", ")}
@@ -765,6 +780,21 @@ ${project.notes}
                 styleProfile,
                 generatorNotes,
               },
+
+              aiPrompt: buildAIPrompt({
+                projectName: project.name,
+                projectTone: project.tone,
+                projectNotes: project.notes,
+                platform: platform.platform,
+                contentType: platform.contentType,
+                purposes: platform.purposes || [],
+                cadence: platform.cadence,
+                day: dayMap[day],
+                time: "Flexible",
+                slot: "",
+                styleProfile,
+                generatorNotes,
+              }),
 
               note: `
 Purpose:
