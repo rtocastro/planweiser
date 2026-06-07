@@ -1,13 +1,13 @@
-function getMetricTotal(task) {
+function getWinnerScore(task) {
   const metrics = task.metrics || {};
 
   return (
     Number(metrics.likes || 0) +
-    Number(metrics.comments || 0) +
-    Number(metrics.shares || 0) +
-    Number(metrics.saves || 0) +
-    Number(metrics.clicks || 0) +
-    Number(metrics.orders || 0)
+    Number(metrics.comments || 0) * 2 +
+    Number(metrics.shares || 0) * 3 +
+    Number(metrics.saves || 0) * 3 +
+    Number(metrics.clicks || 0) * 2 +
+    Number(metrics.orders || 0) * 5
   );
 }
 
@@ -16,7 +16,6 @@ function getBestByGroup(tasks, groupKey) {
 
   tasks.forEach((task) => {
     const key = groupKey(task);
-
     if (!key) return;
 
     if (!groups[key]) {
@@ -27,7 +26,7 @@ function getBestByGroup(tasks, groupKey) {
       };
     }
 
-    groups[key].total += getMetricTotal(task);
+    groups[key].total += getWinnerScore(task);
     groups[key].count += 1;
   });
 
@@ -40,7 +39,7 @@ function getBestByGroup(tasks, groupKey) {
 }
 
 function WinningContentPanel({ tasks }) {
-  const postsWithMetrics = tasks.filter((task) => getMetricTotal(task) > 0);
+  const postsWithMetrics = tasks.filter((task) => getWinnerScore(task) > 0);
 
   if (!postsWithMetrics.length) {
     return (
@@ -52,9 +51,9 @@ function WinningContentPanel({ tasks }) {
     );
   }
 
-  const topPost = [...postsWithMetrics].sort(
-    (a, b) => getMetricTotal(b) - getMetricTotal(a)
-  )[0];
+  const topPosts = [...postsWithMetrics]
+    .sort((a, b) => getWinnerScore(b) - getWinnerScore(a))
+    .slice(0, 5);
 
   const bestPlatform = getBestByGroup(postsWithMetrics, (task) => task.type);
 
@@ -76,12 +75,20 @@ function WinningContentPanel({ tasks }) {
       <h2>🏆 Winning Content</h2>
 
       <div className="winner-grid">
-        <div className="winner-card">
-          <h3>🔥 Top Post</h3>
-          <strong>{topPost.title}</strong>
-          <p>{topPost.type}</p>
-          <p>Score: {getMetricTotal(topPost)}</p>
-        </div>
+        {topPosts.map((post, index) => (
+          <div className="winner-card" key={post.id}>
+            <h3>#{index + 1} Winner</h3>
+            <strong>{post.title}</strong>
+            <p>{post.type}</p>
+            <p>Winner Score: {getWinnerScore(post)}</p>
+
+            {post.finalCaption && (
+              <p>
+                <strong>Caption:</strong> {post.finalCaption}
+              </p>
+            )}
+          </div>
+        ))}
 
         <div className="winner-card">
           <h3>📱 Best Platform</h3>

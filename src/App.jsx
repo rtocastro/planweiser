@@ -818,7 +818,7 @@ ${project.notes}
         </div>
       </section>
 
-            <ProjectManager
+      <ProjectManager
         contentProjects={contentProjects}
         setContentProjects={setContentProjects}
         newProject={newProject}
