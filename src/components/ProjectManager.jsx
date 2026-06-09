@@ -66,7 +66,7 @@ function getProjectEmoji(name = "") {
     }
 
     if (lower.includes("personal")) return "✨";
-    if (lower.includes("r'to") || lower.includes("arto")) return "🎛️";
+    if (lower.includes("r'to") || lower.includes("rtocastro")) return "🎛️";
 
     return "📁";
 }

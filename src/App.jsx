@@ -1036,6 +1036,8 @@ Write a caption draft in Rick's voice.
         </div>
       </section>
 
+      
+
       <ProjectManager
         contentProjects={contentProjects}
         setContentProjects={setContentProjects}
@@ -1045,47 +1047,7 @@ Write a caption draft in Rick's voice.
         deleteProject={deleteProject}
       />
 
-      <section className="project-grid">
-        <button
-          className={`project-card ${activeProject === "all" ? "active" : ""}`}
-          onClick={() => setActiveProject("all")}
-        >
-          <span>🍺</span>
-          <h3>All Plans</h3>
-          <p>Everything in one weekly view.</p>
-        </button>
-
-        {contentProjects.map((project) => (
-          <button
-            key={project.id}
-            className={`project-card ${activeProject === project.id ? "active" : ""
-              }`}
-            onClick={() => setActiveProject(project.id)}
-          >
-            <span>{getProjectEmoji(project.name)}</span>
-
-            <h3>{project.name}</h3>
-
-            <p>{project.platforms?.length || 0} platforms</p>
-          </button>
-        ))}
-      </section>
-
-      <section className="platform-filter">
-        {availablePlatforms.map((platform) => (
-          <button
-            key={platform}
-            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
-              }`}
-            onClick={() => setActivePlatform(platform)}
-          >
-            {platform === "all" ? "All Platforms" : platform}
-          </button>
-        ))}
-      </section>
-
-      <section className="planner-section">
-        <div className="section-header">
+              <div className="section-header">
           <div>
             <p className="eyebrow">This Week</p>
             <h2>Springboard Moves</h2>
@@ -1140,6 +1102,48 @@ Write a caption draft in Rick's voice.
           </div>
         </div>
 
+      <section className="project-grid">
+        <button
+          className={`project-card ${activeProject === "all" ? "active" : ""}`}
+          onClick={() => setActiveProject("all")}
+        >
+          <span>🍺</span>
+          <h3>All Plans</h3>
+          <p>Everything in one weekly view.</p>
+        </button>
+
+        {contentProjects.map((project) => (
+          <button
+            key={project.id}
+            className={`project-card ${activeProject === project.id ? "active" : ""
+              }`}
+            onClick={() => setActiveProject(project.id)}
+          >
+            <span>{getProjectEmoji(project.name)}</span>
+
+            <h3>{project.name}</h3>
+
+            <p>{project.platforms?.length || 0} platforms</p>
+          </button>
+        ))}
+      </section>
+
+            <section className="platform-filter">
+        {availablePlatforms.map((platform) => (
+          <button
+            key={platform}
+            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
+              }`}
+            onClick={() => setActivePlatform(platform)}
+          >
+            {platform === "all" ? "All Platforms" : platform}
+          </button>
+        ))}
+      </section>
+
+            <section className="planner-section">
+
+
         <div className="task-list">
           {filteredTasks.map((task) => {
             const project = contentProjects.find(
@@ -1163,6 +1167,8 @@ Write a caption draft in Rick's voice.
           })}
         </div>
       </section>
+
+
 
       <TemplateLibrary
         customTemplates={customTemplates}
