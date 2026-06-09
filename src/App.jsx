@@ -1036,7 +1036,7 @@ Write a caption draft in Rick's voice.
         </div>
       </section>
 
-      
+
 
       <ProjectManager
         contentProjects={contentProjects}
@@ -1047,60 +1047,33 @@ Write a caption draft in Rick's voice.
         deleteProject={deleteProject}
       />
 
-              <div className="section-header">
-          <div>
-            <p className="eyebrow">This Week</p>
-            <h2>Springboard Moves</h2>
-          </div>
-
-          <div className="header-buttons">
-            <button
-              className="ghost-button"
-              onClick={() => setIsGeneratorOpen(true)}
-            >
-              ⚡ Generate Week
-            </button>
-
-            <button
-              className="ghost-button"
-              type="button"
-              onClick={() =>
-                setAiMode((current) => (current === "local" ? "ai" : "local"))
-              }
-            >
-              {aiMode === "ai" ? "🤖 Mock AI On" : "🧠 Local Drafts"}
-            </button>
-
-            <button
-              className="ghost-button"
-              onClick={generateCalendarFromProjects}
-            >
-              ⚡ Generate Calendar
-            </button>
-
-            <button
-              className="ghost-button"
-              onClick={() => setIsModalOpen(true)}
-            >
-              + Add Move
-            </button>
-
-            <button className="ghost-button" onClick={saveCurrentAsTemplate}>
-              Save As Template
-            </button>
-
-            <button className="ghost-button danger-button" onClick={archiveWeek}>
-              Archive Week
-            </button>
-
-            <input
-              className="template-input"
-              placeholder="PSPSPS Push Week"
-              value={newTemplateName}
-              onChange={(e) => setNewTemplateName(e.target.value)}
-            />
-          </div>
+      <div className="section-header">
+        <div>
+          <p className="eyebrow">This Week</p>
+          <h2>Springboard Moves</h2>
         </div>
+
+        <div className="header-buttons">
+
+          <button
+            className="ghost-button"
+            type="button"
+            onClick={() =>
+              setAiMode((current) => (current === "local" ? "ai" : "local"))
+            }
+          >
+            {aiMode === "ai" ? "🤖 Mock AI On" : "🧠 Local Drafts"}
+          </button>
+
+          <button
+            className="ghost-button"
+            onClick={generateCalendarFromProjects}
+          >
+            ⚡ Generate Calendar
+          </button>
+          <br />
+        </div>
+      </div>
 
       <section className="project-grid">
         <button
@@ -1128,7 +1101,7 @@ Write a caption draft in Rick's voice.
         ))}
       </section>
 
-            <section className="platform-filter">
+      <section className="platform-filter">
         {availablePlatforms.map((platform) => (
           <button
             key={platform}
@@ -1141,7 +1114,7 @@ Write a caption draft in Rick's voice.
         ))}
       </section>
 
-            <section className="planner-section">
+      <section className="planner-section">
 
 
         <div className="task-list">
