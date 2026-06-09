@@ -29,6 +29,17 @@ function TaskCard({
     navigator.clipboard.writeText(task.finalCaption);
   }
 
+  if (task.done) {
+  return (
+    <article className="task-pill" onClick={() => onToggle(task.id)}>
+      <span>{project?.emoji || "📁"} {platformIcon || "📡"}</span>
+      <strong>{task.day}</strong>
+      <span>{task.type}</span>
+      <span>{task.title}</span>
+    </article>
+  );
+}
+
   return (
     <article className={`task-card ${task.done ? "done" : ""}`}>
       <div className="task-main">
