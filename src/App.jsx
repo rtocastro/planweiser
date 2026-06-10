@@ -28,6 +28,7 @@ const emptyMove = {
   note: "",
 };
 
+
 function getProjectEmoji(name = "") {
   const lower = name.toLowerCase();
 
@@ -208,6 +209,8 @@ function App() {
   }, [tasks]);
 
   const completed = tasks.filter((task) => task.done).length;
+
+
 
   const progress = tasks.length
     ? Math.round((completed / tasks.length) * 100)
@@ -684,6 +687,26 @@ Nothing fancy — just keeping momentum going.`;
     return nextDate.toISOString().split("T")[0];
   }
 
+      function getTopPerformer(allTasks) {
+      return [...allTasks]
+        .filter((task) => task.metrics)
+        .sort((a, b) => {
+          const scoreA =
+            Number(a.metrics?.likes || 0) +
+            Number(a.metrics?.comments || 0) * 2 +
+            Number(a.metrics?.shares || 0) * 3 +
+            Number(a.metrics?.saves || 0) * 2;
+
+          const scoreB =
+            Number(b.metrics?.likes || 0) +
+            Number(b.metrics?.comments || 0) * 2 +
+            Number(b.metrics?.shares || 0) * 3 +
+            Number(b.metrics?.saves || 0) * 2;
+
+          return scoreB - scoreA;
+        })[0];
+    }
+
   async function generateCalendarFromProjects() {
     const dayMap = {
       Mon: "Monday",
@@ -774,6 +797,7 @@ Write one caption draft in Rick's voice.
 Keep it natural, specific, non-corporate, non-salesy, and ready for light editing.
 `.trim();
     }
+
 
     contentProjects.forEach((project) => {
       project.platforms.forEach((platform) => {
@@ -994,6 +1018,8 @@ Write a caption draft in Rick's voice.
     return [...tasks, ...archivedTasks];
   }, [tasks, archives]);
 
+  const bestPost = getTopPerformer(allTrackedTasks);
+
   return (
     <main className="app-shell">
       <section className="hero">
@@ -1007,8 +1033,42 @@ Write a caption draft in Rick's voice.
         </div>
 
         <div className="progress-card">
-          <span>Weekly Progress</span>
-          <strong>{progress}%</strong>
+          <span>🏆 Top Performer</span>
+
+          {bestPost ? (
+            <>
+              <strong>{bestPost.type}</strong>
+
+              <p>
+                {bestPost.winnerTags || "No tags yet"}
+              </p>
+
+              <div className="top-post-preview">
+                {(
+                  bestPost.finalCaption ||
+                  bestPost.captionDraft ||
+                  "No caption"
+                ).slice(0, 140)}
+                ...
+              </div>
+
+              <hr />
+
+              <div className="momentum-block">
+                <span>Momentum</span>
+                <strong>{momentumScore}</strong>
+              </div>
+            </>
+          ) : (
+            <>
+              <strong>No winner yet</strong>
+
+              <p>
+                Add metrics to a few posts and your
+                top performer will appear here.
+              </p>
+            </>
+          )}
 
           <div className="progress-track">
             <div style={{ width: `${progress}%` }} />
