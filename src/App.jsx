@@ -1,14 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { templates } from "./data/templates";
 import "./App.css";
 
 // components
 import TaskCard from "./components/TaskCard";
-import GeneratorModal from "./components/GeneratorModal";
-import AddMoveModal from "./components/AddMoveModal";
 import EditTaskModal from "./components/EditTaskModal";
 import ArchiveSection from "./components/ArchiveSection";
-import TemplateLibrary from "./components/TemplateLibrary";
 import StyleProfile from "./components/StyleProfile";
 import ProjectManager from "./components/ProjectManager";
 import WinningContentPanel from "./components/WinningContentPanel";
@@ -16,18 +12,7 @@ import WinningContentPanel from "./components/WinningContentPanel";
 // Service
 import { generateDraftFromPrompt } from "./services/aiService";
 
-
 const starterTasks = [];
-
-const emptyMove = {
-  projectId: "",
-  day: "Monday",
-  time: "",
-  title: "",
-  type: "Task",
-  note: "",
-};
-
 
 function getProjectEmoji(name = "") {
   const lower = name.toLowerCase();
@@ -85,25 +70,35 @@ function getPlatformIcon(platform = "") {
   return "📡";
 }
 
+function getTopPerformer(allTasks = []) {
+  return [...allTasks]
+    .filter((task) => task.metrics)
+    .sort((a, b) => {
+      const scoreA =
+        Number(a.metrics?.likes || 0) +
+        Number(a.metrics?.comments || 0) * 2 +
+        Number(a.metrics?.shares || 0) * 3 +
+        Number(a.metrics?.saves || 0) * 2 +
+        Number(a.metrics?.clicks || 0) * 2 +
+        Number(a.metrics?.orders || 0) * 5;
+
+      const scoreB =
+        Number(b.metrics?.likes || 0) +
+        Number(b.metrics?.comments || 0) * 2 +
+        Number(b.metrics?.shares || 0) * 3 +
+        Number(b.metrics?.saves || 0) * 2 +
+        Number(b.metrics?.clicks || 0) * 2 +
+        Number(b.metrics?.orders || 0) * 5;
+
+      return scoreB - scoreA;
+    })[0];
+}
+
 function App() {
   const [activeProject, setActiveProject] = useState("all");
   const [activePlatform, setActivePlatform] = useState("all");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newMove, setNewMove] = useState(emptyMove);
-  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [aiMode, setAiMode] = useState("local");
-
-  const [selectedTemplate, setSelectedTemplate] = useState("lowEnergy");
-
-  const [generatorSettings, setGeneratorSettings] = useState({
-    energy: "medium",
-    focus: "all",
-    goal: "engagement",
-    tone: "funny",
-  });
-
-  const [newTemplateName, setNewTemplateName] = useState("");
 
   const [styleProfile, setStyleProfile] = useState(() => {
     const saved = localStorage.getItem("planweiser-style-profile");
@@ -111,11 +106,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        tone: "funny, quirky, witty, light motivation, slightly unhinged",
-        mustInclude: "Geek-E Garments, TZA, personal creativity",
-        avoid: "salesy, cryptic, burnout vibes, overexplaining",
-        goal: "consistency and growth",
-      };
+          tone: "",
+          mustInclude: "",
+          avoid: "",
+          goal: "",
+        };
   });
 
   const [generatorNotes, setGeneratorNotes] = useState(() => {
@@ -124,11 +119,10 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : {
-        customDirection:
-          "funny, quirky, witty, light motivation, slightly unhinged",
-        mustInclude: "Geek-E Garments, TZA, personal creativity",
-        avoid: "salesy, cryptic, burnout vibes, overexplaining",
-      };
+          customDirection: "",
+          mustInclude: "",
+          avoid: "",
+        };
   });
 
   const [tasks, setTasks] = useState(() => {
@@ -141,48 +135,9 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [customTemplates, setCustomTemplates] = useState(() => {
-    const saved = localStorage.getItem("planweiser-custom-templates");
-    return saved ? JSON.parse(saved) : [];
-  });
-
   const [contentProjects, setContentProjects] = useState(() => {
     const saved = localStorage.getItem("planweiser-content-projects");
-
-    return saved
-      ? JSON.parse(saved)
-      : [
-        {
-          id: Date.now(),
-          name: "Thee Zombie Apocalypse",
-          tone: "funny, heavy, witty, direct",
-          notes: "Promote songs and build audience.",
-          platforms: [
-            {
-              id: 1,
-              platform: "Instagram",
-              cadence: "weekly",
-              frequency: 3,
-              postsPerDay: 1,
-              timeSlots: [],
-              days: [],
-              purposes: [],
-              contentType: "Post",
-            },
-            {
-              id: 2,
-              platform: "Threads",
-              cadence: "weekly",
-              frequency: 7,
-              postsPerDay: 1,
-              timeSlots: [],
-              days: [],
-              purposes: [],
-              contentType: "Post",
-            },
-          ],
-        },
-      ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [newProject, setNewProject] = useState({
@@ -190,6 +145,13 @@ function App() {
     tone: "",
     notes: "",
   });
+
+  const allTrackedTasks = useMemo(() => {
+    const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
+    return [...tasks, ...archivedTasks];
+  }, [tasks, archives]);
+
+  const bestPost = getTopPerformer(allTrackedTasks);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
@@ -210,8 +172,6 @@ function App() {
 
   const completed = tasks.filter((task) => task.done).length;
 
-
-
   const progress = tasks.length
     ? Math.round((completed / tasks.length) * 100)
     : 0;
@@ -219,7 +179,7 @@ function App() {
   const momentumScore = tasks.reduce((total, task) => {
     if (!task.done) return total;
 
-    switch (task.type.toLowerCase()) {
+    switch ((task.type || "").toLowerCase()) {
       case "instagram":
         return total + 10;
       case "threads":
@@ -247,13 +207,6 @@ function App() {
       JSON.stringify(generatorNotes)
     );
   }, [generatorNotes]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "planweiser-custom-templates",
-      JSON.stringify(customTemplates)
-    );
-  }, [customTemplates]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -328,7 +281,9 @@ function App() {
       };
 
       setArchives((current) => [archive, ...current]);
-      setTasks((current) => current.filter((task) => task.id !== taskToSave.id));
+      setTasks((current) =>
+        current.filter((task) => task.id !== taskToSave.id)
+      );
       setEditingTask(null);
       return;
     }
@@ -346,179 +301,6 @@ function App() {
         task.id === id ? { ...task, done: !task.done } : task
       )
     );
-  }
-
-  function saveCurrentAsTemplate() {
-    if (!newTemplateName.trim()) return;
-
-    const template = {
-      id: Date.now(),
-      name: newTemplateName,
-      tasks: tasks.map((task) => ({
-        projectId: task.projectId,
-        day: task.day,
-        time: task.time,
-        title: task.title,
-        type: task.type,
-        note: task.note,
-        idea: task.idea,
-        captionDraft: task.captionDraft,
-        finalCaption: task.finalCaption,
-        status: task.status,
-        suggestedDate: task.suggestedDate,
-        postedDate: task.postedDate,
-        metrics: task.metrics,
-        generatorContext: task.generatorContext,
-      })),
-    };
-
-    setCustomTemplates((current) => [template, ...current]);
-    setNewTemplateName("");
-  }
-
-  function loadTemplate(template) {
-    const loadedTasks = template.tasks.map((task, index) => ({
-      id: Date.now() + index,
-      ...task,
-      done: false,
-    }));
-
-    setTasks(loadedTasks);
-  }
-
-  function deleteTemplate(id) {
-    setCustomTemplates((current) =>
-      current.filter((template) => template.id !== id)
-    );
-  }
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setNewMove((current) => ({ ...current, [name]: value }));
-  }
-
-  function addMove(event) {
-    event.preventDefault();
-
-    if (!newMove.title.trim()) return;
-
-    setTasks((current) => [
-      {
-        id: Date.now(),
-        ...newMove,
-        projectId: newMove.projectId || contentProjects[0]?.id || "",
-        time: newMove.time || "Flexible",
-        status: "Drafted",
-        done: false,
-      },
-      ...current,
-    ]);
-
-    setNewMove(emptyMove);
-    setIsModalOpen(false);
-  }
-
-  function generateWeek() {
-    const generated = [];
-
-    if (
-      generatorSettings.focus === "all" ||
-      generatorSettings.focus === "etsy"
-    ) {
-      generated.push({
-        id: Date.now() + 1,
-        projectId: "geek",
-        day: "Monday",
-        time: "9:00 AM",
-        title: "Post product lifestyle photo",
-        type: "Instagram",
-        note:
-          generatorSettings.tone === "funny"
-            ? "Keep it witty and subtle."
-            : "Focus on product visibility.",
-        status: "Drafted",
-        done: false,
-      });
-    }
-
-    if (
-      generatorSettings.focus === "all" ||
-      generatorSettings.focus === "music"
-    ) {
-      generated.push({
-        id: Date.now() + 2,
-        projectId: "tza",
-        day: "Wednesday",
-        time: "7:17 PM",
-        title: "Post riff teaser or meme edit",
-        type: "Threads",
-        note:
-          generatorSettings.goal === "release"
-            ? "Push anticipation for upcoming release."
-            : "Maintain audience momentum.",
-        status: "Drafted",
-        done: false,
-      });
-    }
-
-    if (
-      generatorSettings.focus === "all" ||
-      generatorSettings.focus === "personal"
-    ) {
-      generated.push({
-        id: Date.now() + 3,
-        projectId: "personal",
-        day: "Friday",
-        time: "12:00 PM",
-        title: "Post personal creative thought",
-        type: "Threads",
-        note:
-          generatorSettings.energy === "low"
-            ? "Low-effort relatable post."
-            : "Higher-energy engaging post.",
-        status: "Drafted",
-        done: false,
-      });
-    }
-
-    setTasks((current) => [...generated, ...current]);
-    setIsGeneratorOpen(false);
-  }
-
-  function generateFromTemplate() {
-    const selected = templates[selectedTemplate];
-
-    const contextNote = `
-STYLE
-${styleProfile.tone}
-
-GOAL
-${styleProfile.goal}
-
-MUST INCLUDE
-${styleProfile.mustInclude}
-
-AVOID
-${styleProfile.avoid}
-
-CUSTOM DIRECTION
-${generatorNotes.customDirection}
-`;
-
-    const generated = selected.tasks.map((task, index) => ({
-      id: Date.now() + index,
-      ...task,
-      note: `
-${task.note}
-
-${contextNote}
-`.trim(),
-      status: "Drafted",
-      done: false,
-    }));
-
-    setTasks((current) => [...generated, ...current]);
-    setIsGeneratorOpen(false);
   }
 
   function archiveWeek() {
@@ -556,6 +338,22 @@ ${contextNote}
       tone: "",
       notes: "",
     });
+  }
+
+  function deleteProject(projectId) {
+    const confirmed = window.confirm(
+      "Delete this project and all associated tasks?"
+    );
+
+    if (!confirmed) return;
+
+    setContentProjects((current) =>
+      current.filter((project) => project.id !== projectId)
+    );
+
+    setTasks((current) =>
+      current.filter((task) => task.projectId !== projectId)
+    );
   }
 
   function getIdeaFromPurpose(platform) {
@@ -687,80 +485,41 @@ Nothing fancy — just keeping momentum going.`;
     return nextDate.toISOString().split("T")[0];
   }
 
-      function getTopPerformer(allTasks) {
-      return [...allTasks]
-        .filter((task) => task.metrics)
-        .sort((a, b) => {
-          const scoreA =
-            Number(a.metrics?.likes || 0) +
-            Number(a.metrics?.comments || 0) * 2 +
-            Number(a.metrics?.shares || 0) * 3 +
-            Number(a.metrics?.saves || 0) * 2;
+  function getWinnerInsights(tasksToScore = []) {
+    const winners = [...tasksToScore]
+      .filter((task) => task.metrics)
+      .sort((a, b) => {
+        const scoreA =
+          Number(a.metrics?.likes || 0) +
+          Number(a.metrics?.comments || 0) * 2 +
+          Number(a.metrics?.shares || 0) * 3;
 
-          const scoreB =
-            Number(b.metrics?.likes || 0) +
-            Number(b.metrics?.comments || 0) * 2 +
-            Number(b.metrics?.shares || 0) * 3 +
-            Number(b.metrics?.saves || 0) * 2;
+        const scoreB =
+          Number(b.metrics?.likes || 0) +
+          Number(b.metrics?.comments || 0) * 2 +
+          Number(b.metrics?.shares || 0) * 3;
 
-          return scoreB - scoreA;
-        })[0];
-    }
+        return scoreB - scoreA;
+      })
+      .slice(0, 5);
 
-  async function generateCalendarFromProjects() {
-    const dayMap = {
-      Mon: "Monday",
-      Tue: "Tuesday",
-      Wed: "Wednesday",
-      Thu: "Thursday",
-      Fri: "Friday",
-      Sat: "Saturday",
-      Sun: "Sunday",
-    };
+    if (!winners.length) return "No winner history yet.";
 
-    const slotTimes = {
-      Morning: "9:00 AM",
-      Afternoon: "12:30 PM",
-      Night: "7:17 PM",
-    };
-
-    const generatedTasks = [];
-
-    function getWinnerInsights(tasks = []) {
-      const winners = [...tasks]
-        .filter((task) => task.metrics)
-        .sort((a, b) => {
-          const scoreA =
-            Number(a.metrics?.likes || 0) +
-            Number(a.metrics?.comments || 0) * 2 +
-            Number(a.metrics?.shares || 0) * 3;
-
-          const scoreB =
-            Number(b.metrics?.likes || 0) +
-            Number(b.metrics?.comments || 0) * 2 +
-            Number(b.metrics?.shares || 0) * 3;
-
-          return scoreB - scoreA;
-        })
-        .slice(0, 5);
-
-      if (!winners.length) return "No winner history yet.";
-
-      return winners
-        .map(
-          (winner) => `
+    return winners
+      .map(
+        (winner) => `
 Title: ${winner.title}
 Platform: ${winner.type}
 Tags: ${winner.winnerTags || "none"}
 Caption:
 ${winner.finalCaption || winner.captionDraft || ""}
 `
-        )
-        .join("\n\n");
-    }
+      )
+      .join("\n\n");
+  }
 
-    function buildAIPrompt(taskContext) {
-      return `
+  function buildAIPrompt(taskContext) {
+    return `
 GLOBAL STYLE:
 Tone: ${taskContext.styleProfile?.tone || ""}
 Must include: ${taskContext.styleProfile?.mustInclude || ""}
@@ -793,14 +552,74 @@ WINNING CONTENT:
 ${taskContext.winnerInsights || "No winner history yet."}
 
 TASK:
-Write one caption draft in Rick's voice.
+Write one caption draft in the user's voice.
 Keep it natural, specific, non-corporate, non-salesy, and ready for light editing.
 `.trim();
+  }
+
+  async function generateAiDrafts(tasksToProcess) {
+    const updatedTasks = [];
+
+    for (const task of tasksToProcess) {
+      const prompt = task.aiPrompt || buildPrompt(task);
+      const draft = await generateDraftFromPrompt(prompt);
+
+      updatedTasks.push({
+        ...task,
+        captionDraft: draft,
+      });
     }
 
+    return updatedTasks;
+  }
+
+  function buildPrompt(task) {
+    return `
+GLOBAL STYLE:
+${styleProfile.tone}
+
+GOAL:
+${styleProfile.goal}
+
+TASK:
+${task.title}
+
+PLATFORM:
+${task.type}
+
+IDEA:
+${task.idea}
+
+NOTES:
+${task.note}
+
+Write a caption draft in the user's voice.
+`;
+  }
+
+  async function generateCalendarFromProjects() {
+    const dayMap = {
+      Mon: "Monday",
+      Tue: "Tuesday",
+      Wed: "Wednesday",
+      Thu: "Thursday",
+      Fri: "Friday",
+      Sat: "Saturday",
+      Sun: "Sunday",
+    };
+
+    const slotTimes = {
+      Morning: "9:00 AM",
+      Afternoon: "12:30 PM",
+      Night: "7:17 PM",
+    };
+
+    const generatedTasks = [];
 
     contentProjects.forEach((project) => {
       project.platforms.forEach((platform) => {
+        if (!platform.platform) return;
+
         const selectedDays =
           platform.days?.length > 0
             ? platform.days
@@ -941,94 +760,26 @@ ${project.notes}
       });
     });
 
+    if (!generatedTasks.length) return;
+
     if (aiMode === "ai") {
-      const draftedTasks =
-        await generateAiDrafts(generatedTasks);
+      const draftedTasks = await generateAiDrafts(generatedTasks);
 
-      setTasks((current) => [
-        ...draftedTasks,
-        ...current,
-      ]);
+      setTasks((current) => [...draftedTasks, ...current]);
     } else {
-      setTasks((current) => [
-        ...generatedTasks,
-        ...current,
-      ]);
+      setTasks((current) => [...generatedTasks, ...current]);
     }
   }
-
-  function deleteProject(projectId) {
-    const confirmed = window.confirm(
-      "Delete this project and all associated tasks?"
-    );
-
-    if (!confirmed) return;
-
-    setContentProjects((current) =>
-      current.filter((project) => project.id !== projectId)
-    );
-
-    setTasks((current) =>
-      current.filter((task) => task.projectId !== projectId)
-    );
-  }
-
-  async function generateAiDrafts(tasksToProcess) {
-    const updatedTasks = [];
-
-    for (const task of tasksToProcess) {
-      const prompt = task.aiPrompt || buildPrompt(task);
-      const draft = await generateDraftFromPrompt(prompt);
-
-      updatedTasks.push({
-        ...task,
-        captionDraft: draft,
-      });
-    }
-
-    return updatedTasks;
-  }
-
-  function buildPrompt(task) {
-    return `
-GLOBAL STYLE:
-${styleProfile.tone}
-
-GOAL:
-${styleProfile.goal}
-
-TASK:
-${task.title}
-
-PLATFORM:
-${task.type}
-
-IDEA:
-${task.idea}
-
-NOTES:
-${task.note}
-
-Write a caption draft in Rick's voice.
-`;
-  }
-
-  const allTrackedTasks = useMemo(() => {
-    const archivedTasks = archives.flatMap((archive) => archive.tasks || []);
-    return [...tasks, ...archivedTasks];
-  }, [tasks, archives]);
-
-  const bestPost = getTopPerformer(allTrackedTasks);
 
   return (
     <main className="app-shell">
       <section className="hero">
         <div>
-          <p className="eyebrow">Planweiser</p>
+          <p className="eyebrow">Planweiser Beta</p>
           <h1>Plan wiser. Post smoother. Burn out less.</h1>
           <p className="hero-copy">
-            A fastmode creative planning dashboard for your weekly Springboard,
-            Etsy pushes, music drops, and personal content rhythm.
+            A fastmode creative planning dashboard for weekly content planning,
+            campaign pushes, music drops, social posts, and creative momentum.
           </p>
         </div>
 
@@ -1039,9 +790,7 @@ Write a caption draft in Rick's voice.
             <>
               <strong>{bestPost.type}</strong>
 
-              <p>
-                {bestPost.winnerTags || "No tags yet"}
-              </p>
+              <p>{bestPost.winnerTags || "No tags yet"}</p>
 
               <div className="top-post-preview">
                 {(
@@ -1064,8 +813,8 @@ Write a caption draft in Rick's voice.
               <strong>No winner yet</strong>
 
               <p>
-                Add metrics to a few posts and your
-                top performer will appear here.
+                Add metrics to a few posts and your top performer will appear
+                here.
               </p>
             </>
           )}
@@ -1077,26 +826,15 @@ Write a caption draft in Rick's voice.
           <p>
             {completed} of {tasks.length} moves completed
           </p>
-
-          <hr />
-
-          <div className="momentum-block">
-            <span>Momentum</span>
-            <strong>{momentumScore}</strong>
-          </div>
         </div>
       </section>
 
       <section>
-        <div>
-          <StyleProfile
-            styleProfile={styleProfile}
-            setStyleProfile={setStyleProfile}
-          />
-        </div>
+        <StyleProfile
+          styleProfile={styleProfile}
+          setStyleProfile={setStyleProfile}
+        />
       </section>
-
-
 
       <ProjectManager
         contentProjects={contentProjects}
@@ -1114,7 +852,6 @@ Write a caption draft in Rick's voice.
         </div>
 
         <div className="header-buttons">
-
           <button
             className="ghost-button"
             type="button"
@@ -1127,11 +864,11 @@ Write a caption draft in Rick's voice.
 
           <button
             className="ghost-button"
+            type="button"
             onClick={generateCalendarFromProjects}
           >
             ⚡ Generate Calendar
           </button>
-          <br />
         </div>
       </div>
 
@@ -1148,14 +885,13 @@ Write a caption draft in Rick's voice.
         {contentProjects.map((project) => (
           <button
             key={project.id}
-            className={`project-card ${activeProject === project.id ? "active" : ""
-              }`}
+            className={`project-card ${
+              activeProject === project.id ? "active" : ""
+            }`}
             onClick={() => setActiveProject(project.id)}
           >
             <span>{getProjectEmoji(project.name)}</span>
-
             <h3>{project.name}</h3>
-
             <p>{project.platforms?.length || 0} platforms</p>
           </button>
         ))}
@@ -1165,8 +901,9 @@ Write a caption draft in Rick's voice.
         {availablePlatforms.map((platform) => (
           <button
             key={platform}
-            className={`platform-filter-button ${activePlatform === platform ? "active" : ""
-              }`}
+            className={`platform-filter-button ${
+              activePlatform === platform ? "active" : ""
+            }`}
             onClick={() => setActivePlatform(platform)}
           >
             {platform === "all" ? "All Platforms" : platform}
@@ -1175,8 +912,6 @@ Write a caption draft in Rick's voice.
       </section>
 
       <section className="planner-section">
-
-
         <div className="task-list">
           {filteredTasks.map((task) => {
             const project = contentProjects.find(
@@ -1201,38 +936,9 @@ Write a caption draft in Rick's voice.
         </div>
       </section>
 
-
-
-      <TemplateLibrary
-        customTemplates={customTemplates}
-        loadTemplate={loadTemplate}
-        deleteTemplate={deleteTemplate}
-      />
-
       <ArchiveSection archives={archives} />
 
       <WinningContentPanel tasks={allTrackedTasks} />
-
-      <GeneratorModal
-        isOpen={isGeneratorOpen}
-        onClose={() => setIsGeneratorOpen(false)}
-        generatorSettings={generatorSettings}
-        setGeneratorSettings={setGeneratorSettings}
-        selectedTemplate={selectedTemplate}
-        setSelectedTemplate={setSelectedTemplate}
-        generateFromTemplate={generateFromTemplate}
-        generatorNotes={generatorNotes}
-        setGeneratorNotes={setGeneratorNotes}
-      />
-
-      <AddMoveModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        newMove={newMove}
-        projects={contentProjects}
-        handleChange={handleChange}
-        addMove={addMove}
-      />
 
       <EditTaskModal
         editingTask={editingTask}
