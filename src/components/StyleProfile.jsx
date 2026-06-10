@@ -18,6 +18,8 @@ function StyleProfile({
         <label>
           Tone
           <textarea
+            placeholder="Funny, dark, introspective, direct, motivational,
+chaotic, educational, serious, metal, etc."
             value={styleProfile.tone}
             onChange={(e) =>
               update("tone", e.target.value)
@@ -28,6 +30,10 @@ function StyleProfile({
         <label>
           Must Include
           <textarea
+            placeholder="Things every caption should remember:
+community building, subtle humor,
+cohesiveness between projects,
+mentioning products naturally, stay professional etc."
             value={styleProfile.mustInclude}
             onChange={(e) =>
               update("mustInclude", e.target.value)
@@ -38,6 +44,10 @@ function StyleProfile({
         <label>
           Avoid
           <textarea
+            placeholder="Things to avoid:
+salesy language, cryptic posts,
+corporate sounding captions,
+burnout vibes, overexplaining, etc."
             value={styleProfile.avoid}
             onChange={(e) =>
               update("avoid", e.target.value)
@@ -48,6 +58,9 @@ function StyleProfile({
         <label>
           Primary Goal
           <input
+            placeholder="Consistency, engagement,
+sales, audience growth,financial growth
+brand awareness, community building, etc."
             value={styleProfile.goal}
             onChange={(e) =>
               update("goal", e.target.value)
