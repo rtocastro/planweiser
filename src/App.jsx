@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import planweiserLogo from "./assets/planweiser.png";
 
 // components
 import TaskCard from "./components/TaskCard";
@@ -774,14 +775,22 @@ ${project.notes}
   return (
     <main className="app-shell">
       <section className="hero">
-        <div>
-          <p className="eyebrow">Planweiser Beta</p>
-          <h1>Plan wiser. Post smoother. Burn out less.</h1>
-          <p className="hero-copy">
-            A fastmode creative planning dashboard for weekly content planning,
-            campaign pushes, music drops, social posts, and creative momentum.
-          </p>
-        </div>
+<div>
+  <div className="hero-logo">
+    <img
+      src={planweiserLogo}
+      alt="Planweiser"
+      className="planweiser-logo"
+    />
+  </div>
+
+  <h1>Plan wiser. Post smoother. Burn out less.</h1>
+
+  <p className="hero-copy">
+    A fastmode creative planning dashboard for weekly content planning,
+    campaign pushes, music drops, social posts, and creative momentum.
+  </p>
+</div>
 
         <div className="progress-card">
           <span>🏆 Top Performer</span>

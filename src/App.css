@@ -872,6 +872,34 @@ body {
   color: var(--cream);
 }
 
+.hero-logo {
+  margin-bottom: 1rem;
+}
+
+.planweiser-logo {
+  width: 350px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255, 0, 0, 0.25))
+    drop-shadow(0 0 20px rgba(255, 0, 0, 0.15));
+}
+
+
+.hero-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.planweiser-logo {
+  width: 420px;
+  max-width: 100%;
+  height: auto;
+}
+
 @media (max-width: 700px) {
   .purpose-picker,
   .day-picker,
