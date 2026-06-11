@@ -872,6 +872,41 @@ body {
   color: var(--cream);
 }
 
+@media (max-width: 700px) {
+  .purpose-picker,
+  .day-picker,
+  .slot-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .purpose-picker label,
+  .day-picker label,
+  .slot-picker label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    line-height: 1.2;
+    word-break: normal;
+  }
+
+  .purpose-picker input,
+  .day-picker input,
+  .slot-picker input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+  }
+
+  .platform-row {
+    overflow: hidden;
+  }
+}
+
+
 @media (max-width: 650px) {
   .metrics-grid {
     grid-template-columns: 1fr;
