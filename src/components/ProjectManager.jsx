@@ -243,17 +243,13 @@ function ProjectManager({
 
             <form className="mini-form" onSubmit={addContentProject}>
                 <input
-                    placeholder="Project name, ex: Thee Zombie Apocalypse
-Geek-E Garments
-Fruitbat
-Personal Brand
-R'To"
+                    placeholder="Project name, ex: Artist, Brand, Group, Project etc"
                     value={newProject.name}
                     onChange={(e) => updateProject("name", e.target.value)}
                 />
 
                 <input
-                    placeholder="Tone, ex: Funny, heavy, direct
+                    placeholder="Sub-Tone, ex: Funny, emotional, angry, heavy, direct
 Educational, community-focused
 Witty, relatable, observational"
                     value={newProject.tone}
@@ -264,10 +260,10 @@ Witty, relatable, observational"
                     placeholder="Describe the project.
 
 Target audience:
-Cat lovers, skaters, musicians...
+Cat lovers, skaters, musicians, actors, photographers...
 
 Assets available:
-Photos, reels, memes, videos...
+Photos, reels, memes, videos etc...
 
 Current goals:
 Promote apparel/wearables,
